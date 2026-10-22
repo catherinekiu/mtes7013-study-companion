@@ -1,0 +1,2257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#16324f" />
+  <title>MTES7013 Study Companion V3 — Ask MTES7013</title>
+
+  <!-- Telegram Mini App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    :root{
+      --navy:#16324f;
+      --navy2:#214f78;
+      --blue:#4f8fcb;
+      --light:#eef6fc;
+      --white:#ffffff;
+      --ink:#1f2937;
+      --muted:#64748b;
+      --line:#dbe5ee;
+      --success:#2f855a;
+      --warn:#b7791f;
+      --danger:#b83232;
+      --shadow:0 10px 30px rgba(22,50,79,.10);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:#f6f9fc;color:var(--ink)}
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer}
+    a{color:var(--navy2)}
+    .hidden{display:none!important}
+
+    .app{
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .topbar{
+      position:sticky;top:0;z-index:20;
+      background:linear-gradient(135deg,var(--navy),var(--navy2));
+      color:white;padding:14px 16px 12px;
+      box-shadow:0 4px 18px rgba(0,0,0,.12);
+    }
+    .toprow{display:flex;align-items:center;gap:12px}
+    .menu-btn{
+      width:42px;height:42px;border:none;border-radius:12px;
+      background:rgba(255,255,255,.14);color:white;font-size:22px;
+    }
+    .brand{flex:1}
+    .brand h1{margin:0;font-size:18px;line-height:1.2}
+    .brand p{margin:3px 0 0;font-size:12px;opacity:.82}
+    .progress-wrap{margin-top:10px}
+    .progress-label{display:flex;justify-content:space-between;font-size:11px;opacity:.88;margin-bottom:5px}
+    .progress{height:7px;border-radius:999px;background:rgba(255,255,255,.18);overflow:hidden}
+    .progress > span{display:block;height:100%;background:white;width:0%;transition:.25s}
+
+    .layout{display:flex;flex:1;min-height:0}
+    .sidebar{
+      position:fixed;inset:0 auto 0 0;width:min(86vw,320px);
+      background:white;z-index:40;transform:translateX(-105%);
+      transition:.25s;box-shadow:20px 0 40px rgba(0,0,0,.15);
+      padding:18px 14px;overflow:auto;
+    }
+    .sidebar.open{transform:translateX(0)}
+    .overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:35;display:none}
+    .overlay.show{display:block}
+    .sidebar-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .sidebar-head strong{color:var(--navy)}
+    .close-btn{border:none;background:#eef3f8;border-radius:10px;width:36px;height:36px}
+    .nav-section{margin-top:18px}
+    .nav-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800;margin:0 8px 8px}
+    .nav-btn{
+      width:100%;text-align:left;border:none;background:transparent;
+      padding:11px 12px;border-radius:12px;color:var(--ink);margin:2px 0;
+      display:flex;gap:10px;align-items:center
+    }
+    .nav-btn:hover,.nav-btn.active{background:var(--light);color:var(--navy);font-weight:700}
+    .nav-ico{width:24px;text-align:center}
+
+    main{width:100%;max-width:980px;margin:0 auto;padding:18px 14px 88px}
+    .hero{
+      background:linear-gradient(145deg,#ffffff,#eef6fc);
+      border:1px solid var(--line);border-radius:22px;padding:20px;
+      box-shadow:var(--shadow);margin-bottom:16px
+    }
+    .hero h2{margin:0 0 7px;color:var(--navy);font-size:24px}
+    .hero p{margin:0;color:var(--muted);line-height:1.6}
+    .welcome-name{font-weight:800;color:var(--navy2)}
+
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .card{
+      background:white;border:1px solid var(--line);border-radius:var(--radius);
+      padding:16px;box-shadow:0 5px 18px rgba(22,50,79,.05)
+    }
+    .action-card{border:none;text-align:left;min-height:136px;transition:.18s}
+    .action-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+    .action-card .icon{font-size:26px;margin-bottom:9px}
+    .action-card h3{margin:0;color:var(--navy);font-size:15px}
+    .action-card p{margin:6px 0 0;font-size:12px;line-height:1.5;color:var(--muted)}
+
+    .section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:3px 0 14px}
+    .section-head h2{margin:0;color:var(--navy);font-size:22px}
+    .section-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
+    .badge{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:var(--light);color:var(--navy2);font-size:11px;font-weight:800}
+
+    .topic-list{display:grid;gap:10px}
+    .topic-item{
+      background:white;border:1px solid var(--line);border-radius:16px;padding:14px;
+      display:flex;align-items:center;gap:12px
+    }
+    .topic-num{width:38px;height:38px;border-radius:12px;background:var(--light);color:var(--navy);display:grid;place-items:center;font-weight:900}
+    .topic-text{flex:1}
+    .topic-text h3{margin:0;font-size:14px;color:var(--navy)}
+    .topic-text p{margin:4px 0 0;font-size:12px;color:var(--muted)}
+    .small-btn,.primary,.secondary,.danger{
+      border:none;border-radius:12px;padding:10px 14px;font-weight:800
+    }
+    .small-btn{background:var(--light);color:var(--navy);padding:8px 11px;font-size:12px}
+    .primary{background:var(--navy);color:white}
+    .secondary{background:#e8f0f7;color:var(--navy)}
+    .danger{background:#feecec;color:var(--danger)}
+
+    .module-box{background:white;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
+    .module-box h3{margin:0 0 8px;color:var(--navy)}
+    .module-box h4{margin:14px 0 5px;color:var(--navy2)}
+    .module-box p,.module-box li{font-size:13px;line-height:1.65}
+    .module-box ul{padding-left:20px}
+    .callout{border-left:4px solid var(--blue);padding:11px 12px;background:#f4f9fd;border-radius:10px;font-size:13px;line-height:1.55;margin:12px 0}
+    .callout.warn{border-color:#d69e2e;background:#fffaf0}
+    .callout.good{border-color:#38a169;background:#f0fff4}
+
+    .field{margin-bottom:12px}
+    .field label{display:block;font-size:12px;color:var(--muted);font-weight:800;margin-bottom:6px}
+    input[type=text],textarea,select{
+      width:100%;border:1px solid #cfdbe6;border-radius:12px;padding:11px 12px;background:white;color:var(--ink);outline:none
+    }
+    textarea{min-height:120px;resize:vertical;line-height:1.5}
+    input:focus,textarea:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(79,143,203,.12)}
+
+    .btn-row{display:flex;flex-wrap:wrap;gap:8px}
+    .feedback{
+      margin-top:12px;padding:14px;border-radius:14px;background:#f8fafc;border:1px solid var(--line);font-size:13px;line-height:1.6
+    }
+    .score-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+    .score{
+      background:white;border:1px solid var(--line);border-radius:12px;padding:10px
+    }
+    .score b{display:block;color:var(--navy);font-size:12px}
+    .score span{font-size:22px;font-weight:900;color:var(--navy2)}
+
+    .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .compare-col{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px}
+    .compare-col h4{margin:0 0 8px;color:var(--navy)}
+    .criteria{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+    .chip{border:1px solid var(--line);background:white;border-radius:999px;padding:7px 10px;font-size:11px}
+    .chip.active{background:var(--navy);color:white;border-color:var(--navy)}
+
+    .quiz-q{font-size:15px;font-weight:800;color:var(--navy);line-height:1.5;margin-bottom:12px}
+    .quiz-options{display:grid;gap:8px}
+    .quiz-option{width:100%;text-align:left;padding:11px;border:1px solid var(--line);border-radius:12px;background:white}
+    .quiz-option:hover{background:var(--light)}
+    .quiz-option.selected{border-color:var(--navy2);background:#eef6fc}
+    .quiz-option.correct{border-color:#38a169;background:#f0fff4}
+    .quiz-option.wrong{border-color:#e53e3e;background:#fff5f5}
+
+    .assessment-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+    .assess{background:white;border:1px solid var(--line);border-radius:14px;padding:12px}
+    .assess b{color:var(--navy);display:block;font-size:12px}
+    .assess strong{font-size:22px;color:var(--navy2)}
+    .assess small{color:var(--muted)}
+
+    .bottom-nav{
+      position:fixed;left:0;right:0;bottom:0;z-index:18;
+      background:rgba(255,255,255,.96);backdrop-filter:blur(8px);
+      border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);
+      padding:7px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
+    }
+    .bottom-nav button{border:none;background:transparent;color:var(--muted);font-size:10px;padding:5px}
+    .bottom-nav .ico{display:block;font-size:20px;margin-bottom:2px}
+    .bottom-nav button.active{color:var(--navy);font-weight:900}
+
+    .modal{
+      position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:60;
+      display:none;align-items:flex-end;justify-content:center
+    }
+    .modal.show{display:flex}
+    .modal-card{
+      width:100%;max-width:700px;max-height:88vh;overflow:auto;background:white;
+      border-radius:22px 22px 0 0;padding:18px
+    }
+    .modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .modal-head h3{margin:0;color:var(--navy)}
+    .icon-btn{border:none;background:#eef3f8;border-radius:10px;width:36px;height:36px}
+
+    .status-row{display:flex;align-items:center;gap:8px;margin:8px 0}
+    .status-dot{width:9px;height:9px;border-radius:50%;background:#cbd5e1}
+    .status-dot.done{background:#38a169}
+
+
+
+    /* Conversational Study Companion */
+    .chat-shell{
+      background:white;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);
+      overflow:hidden;min-height:calc(100vh - 205px);display:flex;flex-direction:column
+    }
+    .chat-head{
+      padding:13px 14px;border-bottom:1px solid var(--line);
+      display:flex;align-items:center;gap:10px;background:#fbfdff
+    }
+    .bot-avatar{
+      width:42px;height:42px;border-radius:14px;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--navy),var(--blue));color:white;font-size:21px;flex:0 0 auto
+    }
+    .chat-head-main{flex:1;min-width:0}
+    .chat-head-main b{display:block;color:var(--navy);font-size:14px}
+    .chat-head-main span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+    .chat-status{font-size:10.5px;font-weight:800;padding:5px 8px;border-radius:999px;background:#eaf8ef;color:var(--success)}
+    .chat-clear{border:none;background:#eef3f8;color:var(--navy);width:34px;height:34px;border-radius:10px}
+    .suggestions{
+      padding:10px 12px 4px;display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;background:#fbfdff
+    }
+    .suggestions::-webkit-scrollbar{display:none}
+    .suggestion{
+      flex:0 0 auto;border:1px solid var(--line);background:white;color:var(--navy);
+      border-radius:999px;padding:7px 10px;font-size:11px;font-weight:750
+    }
+    .messages{
+      flex:1;min-height:360px;max-height:calc(100vh - 345px);overflow:auto;
+      padding:14px;background:linear-gradient(180deg,#f8fbfe 0%,#f5f8fb 100%)
+    }
+    .msg{display:flex;gap:8px;margin:10px 0;align-items:flex-end}
+    .msg.user{justify-content:flex-end}
+    .mini-avatar{
+      width:28px;height:28px;border-radius:9px;display:grid;place-items:center;
+      background:var(--navy);color:white;font-size:13px;flex:0 0 auto
+    }
+    .bubble{
+      max-width:min(82%,690px);padding:11px 13px;border-radius:16px;
+      font-size:13px;line-height:1.6;white-space:normal;word-break:break-word
+    }
+    .bot .bubble{background:white;border:1px solid var(--line);border-bottom-left-radius:5px}
+    .user .bubble{background:var(--navy);color:white;border-bottom-right-radius:5px}
+    .bubble p{margin:0 0 8px}.bubble p:last-child{margin-bottom:0}
+    .bubble ul,.bubble ol{margin:7px 0;padding-left:19px}
+    .bubble li{margin:3px 0}
+    .answer-source{
+      margin-top:8px;padding-top:7px;border-top:1px dashed var(--line);
+      color:var(--muted);font-size:10.5px;font-weight:700
+    }
+    .followups{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .followup{
+      border:1px solid var(--line);background:#f8fbfe;color:var(--navy);
+      border-radius:999px;padding:5px 8px;font-size:10.5px;font-weight:700
+    }
+    .typing{display:inline-flex;gap:4px;align-items:center}
+    .typing i{width:6px;height:6px;background:#94a3b8;border-radius:50%;animation:bounce 1s infinite}
+    .typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+    @keyframes bounce{0%,70%,100%{transform:translateY(0)}35%{transform:translateY(-4px)}}
+    .chat-compose{
+      border-top:1px solid var(--line);padding:10px;background:white;
+      display:flex;gap:8px;align-items:flex-end
+    }
+    .chat-compose textarea{
+      min-height:44px;max-height:120px;resize:none;border-radius:14px;padding:11px 12px
+    }
+    .send-btn{
+      width:46px;height:46px;border:none;border-radius:14px;background:var(--navy);color:white;
+      font-size:20px;flex:0 0 auto
+    }
+    .scope-note{padding:0 12px 8px;background:white;color:var(--muted);font-size:10px;text-align:center}
+    .mode-note{
+      margin:0 0 12px;padding:10px 12px;border-radius:12px;background:#eef6fc;color:var(--navy);
+      font-size:12px;line-height:1.5;border:1px solid #d7e9f7
+    }
+
+    /* Rich learning modules */
+    .study-intro{
+      background:linear-gradient(135deg,#f8fbfe,#eef6fc);
+      border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px
+    }
+    .study-intro h3{margin:0 0 6px;color:var(--navy)}
+    .study-intro p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+    .study-objectives{display:grid;gap:7px;margin-top:10px}
+    .objective{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.5}
+    .objective span:first-child{color:var(--success);font-weight:900}
+    details.study-sec{
+      background:white;border:1px solid var(--line);border-radius:15px;margin:9px 0;overflow:hidden
+    }
+    details.study-sec > summary{
+      list-style:none;cursor:pointer;padding:14px 15px;font-weight:850;color:var(--navy);
+      display:flex;align-items:center;gap:10px
+    }
+    details.study-sec > summary::-webkit-details-marker{display:none}
+    details.study-sec > summary::after{content:"＋";margin-left:auto;color:var(--navy2);font-size:18px}
+    details.study-sec[open] > summary::after{content:"−"}
+    .study-body{padding:0 15px 15px;font-size:13px;line-height:1.72;color:#273444}
+    .study-body p{margin:8px 0}
+    .study-body h4{color:var(--navy2);margin:15px 0 5px}
+    .study-body ul,.study-body ol{padding-left:20px}
+    .study-body li{margin:5px 0}
+    .key-table{width:100%;border-collapse:collapse;margin:9px 0;font-size:12.5px}
+    .key-table th,.key-table td{border:1px solid var(--line);padding:9px;vertical-align:top}
+    .key-table th{background:var(--light);color:var(--navy);text-align:left}
+    .exam-box{background:#fffaf0;border:1px solid #f4d9a6;border-radius:12px;padding:12px;margin:10px 0}
+    .example-box{background:#f4f9fd;border:1px solid #d7e9f7;border-radius:12px;padding:12px;margin:10px 0}
+    .misconception{background:#fff5f5;border:1px solid #fed7d7;border-radius:12px;padding:12px;margin:10px 0}
+    .selfcheck{background:#f0fff4;border:1px solid #c6f6d5;border-radius:12px;padding:12px;margin:10px 0}
+    .tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .mini-tag{font-size:10.5px;font-weight:800;color:var(--navy2);background:#eaf3fb;border-radius:999px;padding:5px 8px}
+
+    @media (min-width:760px){
+      main{padding:24px 24px 90px}
+      .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .score-grid{grid-template-columns:repeat(6,1fr)}
+      .sidebar{
+        position:sticky;top:0;transform:none;width:280px;box-shadow:none;border-right:1px solid var(--line);
+        height:calc(100vh - 0px);z-index:10
+      }
+      .overlay,.close-btn,.menu-btn{display:none!important}
+      .layout{align-items:flex-start}
+      main{max-width:none}
+      .bottom-nav{left:280px}
+    }
+
+    @media (max-width:520px){
+      .grid{grid-template-columns:1fr 1fr}
+      .assessment-strip{grid-template-columns:1fr}
+      .compare-grid{grid-template-columns:1fr}
+      .hero h2{font-size:21px}
+      .action-card{min-height:125px}
+    }
+  </style>
+</head>
+
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="toprow">
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+      <div class="brand">
+        <h1>MTES7013 Study Companion</h1>
+        <p>Curriculum Development in Primary Mathematics</p>
+      </div>
+      <span class="badge" style="background:rgba(255,255,255,.14);color:white" id="chapterBadge">Ask</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Course progress</span><span id="progressText">0%</span></div>
+      <div class="progress"><span id="progressBar"></span></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <strong>MTES7013 Menu</strong>
+        <button class="close-btn" id="closeMenu">✕</button>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">Study</div>
+        <button class="nav-btn active" data-view="chat"><span class="nav-ico">💬</span>Ask MTES7013</button>
+        <button class="nav-btn" data-view="home"><span class="nav-ico">🏠</span>Dashboard</button>
+        <button class="nav-btn" data-view="topics"><span class="nav-ico">📖</span>Learn Course Topics</button>
+        <button class="nav-btn" data-view="quiz"><span class="nav-ico">🎯</span>Quiz Me</button>
+        <button class="nav-btn" data-view="exam"><span class="nav-ico">📝</span>Exam Revision</button>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">Thinking Skills</div>
+        <button class="nav-btn" data-view="c4"><span class="nav-ico">🧠</span>C4 Analysis Coach</button>
+        <button class="nav-btn" data-view="c5"><span class="nav-ico">⚖️</span>C5 Evaluation Coach</button>
+        <button class="nav-btn" data-view="compare"><span class="nav-ico">🌏</span>Compare Curricula</button>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">Assessment Support</div>
+        <button class="nav-btn" data-view="report"><span class="nav-ico">✍️</span>Report Coach</button>
+        <button class="nav-btn" data-view="presentation"><span class="nav-ico">🎤</span>Presentation Coach</button>
+        <button class="nav-btn" data-view="check"><span class="nav-ico">✅</span>Check My Answer</button>
+        <button class="nav-btn" data-view="sources"><span class="nav-ico">📚</span>Evidence & Sources</button>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">Progress</div>
+        <button class="nav-btn" id="exportProgress"><span class="nav-ico">⬇️</span>Export Progress</button>
+        <button class="nav-btn" id="resetProgress"><span class="nav-ico">♻️</span>Reset Progress</button>
+      </div>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main id="main">
+
+      <!-- ASK MTES7013 CHATBOT -->
+      <section id="view-chat" class="view">
+        <div class="section-head">
+          <div><h2>Ask MTES7013</h2><p>Ask a course question in natural language. Follow-up questions can use the current conversation context.</p></div>
+          <span class="badge">Study Companion</span>
+        </div>
+        <div class="mode-note" id="chatModeNote">
+          <b>Course Knowledge Mode:</b> this version can answer many MTES7013 questions from its embedded subject knowledge. A secure AI backend can be connected later for deeper free-form tutoring.
+        </div>
+
+        <div class="chat-shell">
+          <div class="chat-head">
+            <div class="bot-avatar">🎓</div>
+            <div class="chat-head-main">
+              <b>MTES7013 Companion</b>
+              <span>Curriculum Development in Primary Mathematics</span>
+            </div>
+            <span class="chat-status" id="chatStatus">Course KB</span>
+            <button class="chat-clear" id="clearChat" title="Clear conversation">↻</button>
+          </div>
+
+          <div class="suggestions" id="suggestions">
+            <button class="suggestion">What is the difference between Tyler and Stenhouse?</button>
+            <button class="suggestion">Explain Fikrah Matematik simply.</button>
+            <button class="suggestion">What is the difference between C4 and C5?</button>
+            <button class="suggestion">How do I evaluate two curricula?</button>
+            <button class="suggestion">Explain hidden and null curriculum.</button>
+          </div>
+
+          <div class="messages" id="chatMessages"></div>
+
+          <div class="chat-compose">
+            <textarea id="chatInput" rows="1" placeholder="Ask anything about MTES7013..."></textarea>
+            <button class="send-btn" id="sendChat" aria-label="Send">➤</button>
+          </div>
+          <div class="scope-note">Answers are intended for MTES7013 study support. Verify assessed work against official course documents and genuine sources.</div>
+        </div>
+      </section>
+
+      <!-- HOME -->
+      <section id="view-home" class="view hidden">
+        <div class="hero">
+          <h2>Welcome, <span class="welcome-name" id="welcomeName">student</span> 👋</h2>
+          <p>This companion helps you understand, analyse, evaluate, compare and prepare for MTES7013. It supports your thinking; it does not replace your thinking.</p>
+        </div>
+
+        <div class="assessment-strip">
+          <div class="assess"><b>Comparative Report</b><strong>30%</strong><small>CLO2 · C5 Evaluation</small></div>
+          <div class="assess"><b>Group Presentation</b><strong>20%</strong><small>CLO3 · C5 Evaluation</small></div>
+          <div class="assess"><b>Examination</b><strong>50%</strong><small>CLO1 · C4 Analysis</small></div>
+        </div>
+
+        <div class="grid" id="homeActions">
+          <button class="card action-card" data-go="topics"><div class="icon">📖</div><h3>Learn Topics</h3><p>Six modules covering curriculum theory, Malaysia, international comparison and current issues.</p></button>
+          <button class="card action-card" data-go="c4"><div class="icon">🧠</div><h3>C4 Analysis Coach</h3><p>Move beyond description by examining relationships, assumptions, structures and consequences.</p></button>
+          <button class="card action-card" data-go="c5"><div class="icon">⚖️</div><h3>C5 Evaluation Coach</h3><p>Build evidence-based judgement using criteria, comparison and justification.</p></button>
+          <button class="card action-card" data-go="compare"><div class="icon">🌏</div><h3>Compare Curricula</h3><p>Compare Malaysia with selected international mathematics curricula using focused criteria.</p></button>
+          <button class="card action-card" data-go="report"><div class="icon">✍️</div><h3>Report Coach</h3><p>Plan your 30% comparative curriculum evaluation report without outsourcing your thinking.</p></button>
+          <button class="card action-card" data-go="presentation"><div class="icon">🎤</div><h3>Presentation Coach</h3><p>Build and challenge an evidence-based argument for trends, issues and challenges.</p></button>
+          <button class="card action-card" data-go="exam"><div class="icon">📝</div><h3>Exam Revision</h3><p>Review concepts, compare models and practise C4-style exam questions.</p></button>
+          <button class="card action-card" data-go="quiz"><div class="icon">🎯</div><h3>Quiz Me</h3><p>Short interactive questions with explanations and progress tracking.</p></button>
+          <button class="card action-card" data-go="check"><div class="icon">✅</div><h3>Check My Answer</h3><p>Paste a paragraph or answer and receive rule-based feedback on C4, C5 and evidence.</p></button>
+        </div>
+      </section>
+
+      <!-- TOPICS -->
+      <section id="view-topics" class="view hidden">
+        <div class="section-head">
+          <div><h2>Learn Course Topics</h2><p>Study one module at a time. Mark completed modules to update your progress.</p></div>
+          <span class="badge">6 topics</span>
+        </div>
+        <div class="topic-list" id="topicList"></div>
+      </section>
+
+      <!-- TOPIC DETAIL -->
+      <section id="view-topicdetail" class="view hidden">
+        <div class="section-head">
+          <div><h2 id="topicTitle">Topic</h2><p id="topicSub">Expanded study module · open sections as needed</p></div>
+          <button class="small-btn" data-go="topics">← Topics</button>
+        </div>
+        <div id="topicContent"></div>
+        <div class="btn-row">
+          <button class="primary" id="markTopicDone">Mark Topic Completed</button>
+          <button class="secondary" data-go="quiz">Practise Quiz</button>
+        </div>
+      </section>
+
+      <!-- C4 -->
+      <section id="view-c4" class="view hidden">
+        <div class="section-head"><div><h2>C4 Analysis Coach</h2><p>Analyse relationships, structures, assumptions, consequences and contrasts.</p></div><span class="badge">CLO1</span></div>
+        <div class="module-box">
+          <h3>What counts as analysis?</h3>
+          <div class="callout">Description tells <b>what</b>. Analysis explains <b>how parts relate, why they matter, what assumptions exist, and what consequences follow</b>.</div>
+          <div class="field">
+            <label>Paste your answer or paragraph</label>
+            <textarea id="c4Text" placeholder="Example: Tyler's model begins with objectives and then aligns learning experiences and evaluation..."></textarea>
+          </div>
+          <div class="btn-row"><button class="primary" id="runC4">Analyse My Answer</button><button class="secondary" id="c4Prompt">Give Me a C4 Practice Question</button></div>
+          <div id="c4Feedback" class="feedback hidden"></div>
+        </div>
+      </section>
+
+      <!-- C5 -->
+      <section id="view-c5" class="view hidden">
+        <div class="section-head"><div><h2>C5 Evaluation Coach</h2><p>Use criterion + evidence + comparison + judgement + justification.</p></div><span class="badge">CLO2 / CLO3</span></div>
+        <div class="module-box">
+          <div class="callout good"><b>Evaluation formula:</b> Claim → Evidence → Comparison → Judgement → Justification.</div>
+          <div class="field"><label>Paste your evaluative paragraph</label><textarea id="c5Text" placeholder="Paste your paragraph here..."></textarea></div>
+          <button class="primary" id="runC5">Evaluate My Paragraph</button>
+          <div id="c5Feedback" class="feedback hidden"></div>
+        </div>
+      </section>
+
+      <!-- COMPARE -->
+      <section id="view-compare" class="view hidden">
+        <div class="section-head"><div><h2>Compare Mathematics Curricula</h2><p>Focus on selected criteria instead of claiming one system is simply “better”.</p></div><span class="badge">C5</span></div>
+        <div class="module-box">
+          <div class="compare-grid">
+            <div class="field"><label>Curriculum A</label><select id="countryA"><option>Malaysia</option></select></div>
+            <div class="field"><label>Curriculum B</label><select id="countryB"><option>Singapore</option><option>England</option><option>Finland</option><option>British Columbia</option><option>Australia</option></select></div>
+          </div>
+          <label style="font-size:12px;font-weight:800;color:var(--muted)">Choose comparison criterion</label>
+          <div class="criteria" id="criteriaChips"></div>
+          <button class="primary" id="buildCompare">Build Comparison Guide</button>
+          <div id="compareOutput" class="feedback hidden"></div>
+        </div>
+      </section>
+
+      <!-- REPORT -->
+      <section id="view-report" class="view hidden">
+        <div class="section-head"><div><h2>Comparative Report Coach</h2><p>30% assessment · approximately 1200 words · CLO2 · C5.</p></div><span class="badge">30%</span></div>
+        <div class="module-box" id="reportSteps"></div>
+      </section>
+
+      <!-- PRESENTATION -->
+      <section id="view-presentation" class="view hidden">
+        <div class="section-head"><div><h2>Presentation Coach</h2><p>20% assessment · evidence-based evaluation of a trend, issue or challenge.</p></div><span class="badge">20%</span></div>
+        <div class="module-box">
+          <h3>Suggested argument flow</h3>
+          <ol>
+            <li>Define the trend, issue or challenge.</li>
+            <li>Establish the Malaysian primary mathematics context.</li>
+            <li>Present credible evidence.</li>
+            <li>Explain its impact on curriculum implementation or learning.</li>
+            <li>Connect it with current educational practice.</li>
+            <li>Introduce an international perspective.</li>
+            <li>Evaluate strengths, tensions or limitations.</li>
+            <li>State your group's position.</li>
+            <li>Justify one recommendation.</li>
+            <li>Conclude without overstating the evidence.</li>
+          </ol>
+          <div class="field"><label>Your presentation claim</label><textarea id="presentationClaim" placeholder="Example: AI-supported adaptive learning should be integrated carefully into primary mathematics because..."></textarea></div>
+          <button class="primary" id="challengeArgument">Challenge My Argument</button>
+          <div id="presentationFeedback" class="feedback hidden"></div>
+        </div>
+      </section>
+
+      <!-- EXAM -->
+      <section id="view-exam" class="view hidden">
+        <div class="section-head"><div><h2>Exam Revision</h2><p>50% assessment · CLO1 · focus on C4 analysis.</p></div><span class="badge">50%</span></div>
+        <div class="module-box">
+          <div class="btn-row">
+            <button class="secondary exam-mode" data-mode="quick">Quick Revision</button>
+            <button class="secondary exam-mode" data-mode="models">Compare Models</button>
+            <button class="secondary exam-mode" data-mode="question">C4 Practice Question</button>
+          </div>
+          <div id="examOutput" class="feedback" style="margin-top:12px">Choose a revision mode.</div>
+        </div>
+      </section>
+
+      <!-- QUIZ -->
+      <section id="view-quiz" class="view hidden">
+        <div class="section-head"><div><h2>Quiz Me</h2><p>Answer first. Explanations appear after submission.</p></div><span class="badge" id="quizScoreBadge">0 correct</span></div>
+        <div class="module-box">
+          <div class="quiz-q" id="quizQuestion"></div>
+          <div class="quiz-options" id="quizOptions"></div>
+          <div class="btn-row" style="margin-top:12px">
+            <button class="primary" id="submitQuiz">Submit Answer</button>
+            <button class="secondary" id="nextQuiz">Next Question</button>
+          </div>
+          <div id="quizExplain" class="feedback hidden"></div>
+        </div>
+      </section>
+
+      <!-- CHECK -->
+      <section id="view-check" class="view hidden">
+        <div class="section-head"><div><h2>Check My Answer</h2><p>Rule-based formative feedback for your own draft.</p></div><span class="badge">Formative</span></div>
+        <div class="module-box">
+          <div class="field"><label>What should be checked?</label>
+            <select id="checkMode">
+              <option value="c4">C4 Analysis</option>
+              <option value="c5">C5 Evaluation</option>
+              <option value="evidence">Evidence & Support</option>
+              <option value="academic">Academic Writing</option>
+            </select>
+          </div>
+          <div class="field"><label>Paste your answer</label><textarea id="checkText"></textarea></div>
+          <button class="primary" id="runCheck">Check Answer</button>
+          <div id="checkFeedback" class="feedback hidden"></div>
+        </div>
+      </section>
+
+      <!-- SOURCES -->
+      <section id="view-sources" class="view hidden">
+        <div class="section-head"><div><h2>Evidence & Sources</h2><p>Use evidence responsibly. This prototype does not invent or verify external references.</p></div><span class="badge">Academic integrity</span></div>
+        <div class="module-box">
+          <div class="callout warn"><b>Never invent:</b> DOI, authors, journals, statistics, curriculum policies or international results. If evidence is missing, say so.</div>
+          <h3>Preferred evidence hierarchy</h3>
+          <ol>
+            <li>Official curriculum documents and ministry documents.</li>
+            <li>OECD / IEA / international assessment documentation.</li>
+            <li>Peer-reviewed research.</li>
+            <li>Recognised mathematics education organisations.</li>
+          </ol>
+          <h3>Selected course readings</h3>
+          <ul>
+            <li>Haylock, D., & Manning, R. (2020). <i>Mathematics explained for primary teachers</i> (6th ed.). Sage.</li>
+            <li>Shimizu, Y., & Vithal, R. (Eds.). (2023). <i>Mathematics curriculum reforms around the world: The 24th ICMI Study</i>. Springer.</li>
+            <li>Qi, C., Fan, L., Liu, J., Liu, Q., & Dong, L. (Eds.). (2024). <i>Recent advances in mathematics textbook research and development</i>. Springer.</li>
+            <li>OECD. (2024). <i>An evolution of mathematics curriculum: Where it was, where it stands and where it is going</i>.</li>
+            <li>Ministry of Education Malaysia. (2024). <i>Laporan awal pencapaian Malaysia dalam TIMSS 2023</i>.</li>
+            <li>OECD. (2024). <i>PISA 2025 mathematics framework</i>.</li>
+          </ul>
+          <div class="field"><label>Record a source or DOI for your own notes</label><textarea id="sourceNotes" placeholder="Paste DOI, URL, citation or notes here..."></textarea></div>
+          <button class="primary" id="saveSources">Save Source Notes</button>
+          <div id="sourceSaved" class="feedback hidden">Saved locally on this device.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="active" data-go="chat"><span class="ico">💬</span>Ask</button>
+    <button data-go="topics"><span class="ico">📖</span>Learn</button>
+    <button data-go="quiz"><span class="ico">🎯</span>Quiz</button>
+    <button data-go="check"><span class="ico">✅</span>Check</button>
+  </nav>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <div class="modal-head"><h3 id="modalTitle">Study Companion</h3><button class="icon-btn" id="closeModal">✕</button></div>
+    <div id="modalBody" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   MTES7013 STUDY COMPANION
+   Static prototype - no AI API
+   ========================= */
+
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+}
+
+const state = JSON.parse(localStorage.getItem('mtes7013_state') || '{}');
+state.completedTopics = state.completedTopics || [];
+state.quizCorrect = state.quizCorrect || 0;
+state.quizAttempts = state.quizAttempts || 0;
+state.sourceNotes = state.sourceNotes || '';
+state.reportSteps = state.reportSteps || {};
+state.currentTopic = state.currentTopic ?? 0;
+state.chatHistory = state.chatHistory || [];
+state.lastKnowledgeId = state.lastKnowledgeId || null;
+
+function saveState(){
+  localStorage.setItem('mtes7013_state', JSON.stringify(state));
+  updateProgress();
+}
+
+function getTelegramName(){
+  const first = tg?.initDataUnsafe?.user?.first_name;
+  return first || 'student';
+}
+document.getElementById('welcomeName').textContent = getTelegramName();
+
+const topics = [
+  {
+    title:'Topic 1 — Introduction to Curriculum',
+    sub:'Curriculum concepts, definitions, dimensions and types',
+    html:`
+      <div class="study-intro">
+        <h3>Topic 1 Study Module</h3>
+        <p>This topic builds the vocabulary you need for the rest of MTES7013. The key idea is that curriculum is more than a written syllabus: it can be viewed as an intended document, an enacted process and the learning experience actually encountered by pupils.</p>
+        <div class="study-objectives">
+          <div class="objective"><span>✓</span><span>Explain classical and contemporary ways of understanding curriculum.</span></div>
+          <div class="objective"><span>✓</span><span>Differentiate curriculum as document, process and experience.</span></div>
+          <div class="objective"><span>✓</span><span>Distinguish official/formal, informal, hidden/implied and null curriculum using primary mathematics examples.</span></div>
+          <div class="objective"><span>✓</span><span>Analyse tensions between intended curriculum and classroom enactment.</span></div>
+        </div>
+        <div class="tag-row"><span class="mini-tag">CLO1</span><span class="mini-tag">C4 Analyse</span><span class="mini-tag">Foundation</span></div>
+      </div>
+
+      <details class="study-sec" open>
+        <summary>1.1 What is curriculum?</summary>
+        <div class="study-body">
+          <p><b>Curriculum</b> can be understood as the organised educational intentions, content, learning experiences, teaching processes and assessment expectations through which an education system seeks to develop learners.</p>
+          <h4>Classical orientation</h4>
+          <p>A classical view tends to emphasise a planned course of study: subjects, content, objectives and what should be taught. In this view, curriculum is often associated with a syllabus, programme or body of knowledge.</p>
+          <h4>Contemporary orientation</h4>
+          <p>A contemporary view is broader. It considers not only what is written but also what teachers enact, what pupils experience, how learning is assessed, and what values or assumptions are communicated through school practices.</p>
+          <div class="example-box"><b>Primary mathematics example:</b> A DSKP may state that pupils should reason, communicate mathematically and solve problems. If classroom lessons consist mainly of copying procedures and completing routine exercises, the written curriculum and experienced curriculum are not fully aligned.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>1.2 Curriculum as document, process and experience</summary>
+        <div class="study-body">
+          <table class="key-table">
+            <tr><th>Dimension</th><th>Main question</th><th>Primary mathematics example</th></tr>
+            <tr><td><b>Document</b></td><td>What is officially intended?</td><td>Curriculum framework, DSKP, learning standards, performance standards and official guidance.</td></tr>
+            <tr><td><b>Process</b></td><td>How is curriculum translated into teaching and learning?</td><td>Teacher decisions, lesson design, mathematical tasks, questioning, use of manipulatives and assessment.</td></tr>
+            <tr><td><b>Experience</b></td><td>What do pupils actually encounter and learn?</td><td>Whether pupils genuinely reason, discuss strategies and solve non-routine problems—or mainly memorise procedures.</td></tr>
+          </table>
+          <p>These dimensions are related. A strong curriculum is not achieved merely by producing a good document. The intended curriculum must be translated into appropriate pedagogy and experienced meaningfully by learners.</p>
+          <div class="exam-box"><b>C4 thinking:</b> Analyse how a well-designed curriculum document could still result in weak pupil learning. Consider teacher interpretation, task quality, assessment pressure, resources and pupil experience.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>1.3 Types of curriculum</summary>
+        <div class="study-body">
+          <table class="key-table">
+            <tr><th>Type</th><th>Meaning</th><th>Example</th></tr>
+            <tr><td><b>Official curriculum</b></td><td>Curriculum formally approved by the education authority.</td><td>Official mathematics curriculum specifications and standards.</td></tr>
+            <tr><td><b>Formal curriculum</b></td><td>Planned learning organised through timetabled teaching.</td><td>A Year 4 mathematics lesson on fractions.</td></tr>
+            <tr><td><b>Informal curriculum</b></td><td>Learning that occurs through interactions or activities beyond formally planned content.</td><td>Pupils develop estimation while managing money during a class activity.</td></tr>
+            <tr><td><b>Hidden / implied curriculum</b></td><td>Values, norms or expectations communicated indirectly.</td><td>If only fast pupils are praised, pupils may infer that mathematics ability means speed rather than reasoning.</td></tr>
+            <tr><td><b>Null curriculum</b></td><td>Knowledge, skills or perspectives that are omitted or receive little attention.</td><td>If pupils rarely justify solutions, mathematical argument may effectively become part of the null curriculum despite broader aspirations.</td></tr>
+          </table>
+          <div class="misconception"><b>Common misconception:</b> Hidden curriculum does not mean secret content deliberately concealed by teachers. It refers to implicit messages, norms and values learned through educational practices.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>1.4 Relationships among curriculum types</summary>
+        <div class="study-body">
+          <p>Curriculum types often coexist. A school can have a strong official mathematics curriculum, but the enacted formal curriculum may narrow the learning experience. At the same time, hidden messages about who is “good at mathematics” may influence pupil identity.</p>
+          <h4>Useful analytical chain</h4>
+          <p><b>Official intention → Teacher interpretation → Classroom enactment → Pupil experience → Learning outcome</b></p>
+          <p>A weakness at any point can reduce alignment. This is why curriculum analysis should not stop at reading the official document.</p>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>1.5 Self-check and tutorial practice</summary>
+        <div class="study-body">
+          <div class="selfcheck">
+            <b>Self-check 1:</b> A teacher spends almost every lesson preparing pupils for routine test items even though the curriculum emphasises reasoning. Identify at least two curriculum dimensions involved and explain the tension.<br><br>
+            <details><summary><b>Show guidance</b></summary><p>The official/document curriculum emphasises reasoning, while the enacted process and pupil experience are dominated by routine practice. The issue is misalignment between intended and experienced curriculum.</p></details>
+          </div>
+          <div class="selfcheck">
+            <b>Self-check 2:</b> Give one mathematics example each of formal, informal, hidden and null curriculum.
+          </div>
+          <h4>Tutorial prompt</h4>
+          <p>“A curriculum is not what is written; it is what learners experience.” To what extent do you agree? Analyse the statement using at least two curriculum dimensions.</p>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>1.6 Exam focus</summary>
+        <div class="study-body">
+          <div class="exam-box"><b>Likely C4 demand:</b> You may be asked to analyse a classroom or school scenario rather than merely define curriculum terms. Always identify the relevant curriculum concept, explain the relationship or mismatch, and discuss its consequence for mathematics learning.</div>
+          <p><b>Answer structure:</b> Concept → Evidence from scenario → Relationship/tension → Consequence → Brief judgement.</p>
+        </div>
+      </details>`
+  },
+
+  {
+    title:'Topic 2 — Curriculum Design',
+    sub:'Design principles, Tyler, Taba, Stenhouse, design approaches and dimensions',
+    html:`
+      <div class="study-intro">
+        <h3>Topic 2 Study Module</h3>
+        <p>Curriculum design concerns how educational purposes, content, learning experiences and assessment are selected, organised and related. This topic is central to CLO1 because students must analyse models, not merely memorise their stages.</p>
+        <div class="study-objectives">
+          <div class="objective"><span>✓</span><span>Explain relevance, continuity, integration and balance as design principles.</span></div>
+          <div class="objective"><span>✓</span><span>Analyse Tyler, Taba and Stenhouse as different curriculum orientations.</span></div>
+          <div class="objective"><span>✓</span><span>Distinguish rational/objective, bounded and dynamic/interaction approaches.</span></div>
+          <div class="objective"><span>✓</span><span>Explain vertical and horizontal curriculum dimensions.</span></div>
+        </div>
+        <div class="tag-row"><span class="mini-tag">CLO1</span><span class="mini-tag">C4 Analyse</span><span class="mini-tag">Exam Core</span></div>
+      </div>
+
+      <details class="study-sec" open>
+        <summary>2.1 Curriculum design concept</summary>
+        <div class="study-body">
+          <p>Curriculum design is the deliberate arrangement of curriculum elements so that educational intentions can be translated into coherent learning. A design normally addresses purposes, content, sequence, pedagogy, learning experiences and assessment.</p>
+          <p>A curriculum may contain good individual topics but still be weak if the elements are poorly connected. <b>Coherence</b> therefore matters: what pupils are expected to learn, what teachers teach and what assessment rewards should support one another.</p>
+          <div class="example-box"><b>Example:</b> If a curriculum claims to value mathematical reasoning but assessment rewards only final answers, the design creates an alignment problem.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>2.2 Design principles: relevance, continuity, integration and balance</summary>
+        <div class="study-body">
+          <table class="key-table">
+            <tr><th>Principle</th><th>Meaning</th><th>Mathematics application</th></tr>
+            <tr><td><b>Relevance</b></td><td>Learning should connect to educational goals, learner needs and meaningful contexts.</td><td>Using measurement tasks connected to authentic situations rather than disconnected procedures only.</td></tr>
+            <tr><td><b>Continuity</b></td><td>Important ideas should recur and develop progressively over time.</td><td>Number sense develops from whole numbers to fractions, decimals, ratio and proportional reasoning.</td></tr>
+            <tr><td><b>Integration</b></td><td>Knowledge and skills should connect across topics or disciplines where appropriate.</td><td>Using data handling in a STEM investigation or connecting geometry with measurement.</td></tr>
+            <tr><td><b>Balance</b></td><td>Curriculum time and emphasis should not be distorted toward only one type of learning.</td><td>Balancing procedural fluency with conceptual understanding, reasoning and problem solving.</td></tr>
+          </table>
+          <div class="misconception"><b>Common misconception:</b> Continuity does not mean repeating the same content every year. It means revisiting important ideas with increasing sophistication.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>2.3 Tyler Model</summary>
+        <div class="study-body">
+          <p>The Tyler orientation is commonly described as an <b>objective model</b>. It begins with educational purposes and links these to learning experiences, organisation and evaluation.</p>
+          <h4>Analytical strengths</h4>
+          <ul>
+            <li>Provides a clear alignment logic from objectives to assessment.</li>
+            <li>Supports systematic planning and accountability.</li>
+            <li>Helps identify whether learning activities actually serve intended outcomes.</li>
+          </ul>
+          <h4>Possible limitations</h4>
+          <ul>
+            <li>Overly rigid application may underplay emergent learning.</li>
+            <li>Complex mathematical thinking may not always be captured by narrowly specified objectives.</li>
+            <li>Teacher responsiveness can be constrained if objectives are treated as fixed endpoints rather than guides.</li>
+          </ul>
+          <div class="exam-box"><b>C4 prompt:</b> Analyse how an objectives-first design can improve alignment while potentially reducing flexibility. Your answer should show both the relationship and the trade-off.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>2.4 Taba Model</summary>
+        <div class="study-body">
+          <p>Taba is also associated with an objective-oriented tradition, but it gives stronger attention to curriculum development emerging from teachers and classroom needs. It is often described as more <b>inductive</b> or grassroots in orientation.</p>
+          <h4>Why this matters</h4>
+          <p>Teachers work close to learners and can identify misconceptions, readiness and contextual needs. A teacher-involved curriculum process may therefore improve responsiveness. However, decentralised curriculum development also requires strong teacher expertise and mechanisms for coherence across schools.</p>
+          <div class="example-box"><b>Mathematics example:</b> Teachers observe persistent difficulties with fraction magnitude, design diagnostic tasks, select learning experiences and refine the sequence based on pupil responses.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>2.5 Stenhouse Process Model</summary>
+        <div class="study-body">
+          <p>The Stenhouse orientation treats curriculum less as a fixed package of objectives and more as a <b>process to be enacted, investigated and refined through practice</b>. The teacher is not merely a curriculum deliverer but an active professional interpreter.</p>
+          <h4>Implications</h4>
+          <ul>
+            <li>Greater teacher autonomy and professional judgement.</li>
+            <li>Learning processes and quality of inquiry become important, not just predetermined outcomes.</li>
+            <li>Implementation requires teachers capable of reflective curriculum inquiry.</li>
+          </ul>
+          <div class="misconception"><b>Do not write:</b> “Stenhouse has no goals.” A process orientation can still have educational intentions; the distinction concerns how tightly outcomes prescribe the learning process.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>2.6 Tyler vs Taba vs Stenhouse</summary>
+        <div class="study-body">
+          <table class="key-table">
+            <tr><th>Dimension</th><th>Tyler</th><th>Taba</th><th>Stenhouse</th></tr>
+            <tr><td>Orientation</td><td>Objectives / rational planning</td><td>Inductive, teacher-involved objective design</td><td>Process and curriculum-as-practice</td></tr>
+            <tr><td>Starting emphasis</td><td>Educational purposes</td><td>Diagnosis of needs and teacher-informed development</td><td>Educational processes and principles for practice</td></tr>
+            <tr><td>Teacher role</td><td>Planner/implementer within aligned objectives</td><td>Active contributor to curriculum construction</td><td>Professional interpreter and reflective inquirer</td></tr>
+            <tr><td>Main strength</td><td>Clarity and alignment</td><td>Contextual responsiveness</td><td>Flexibility and professional inquiry</td></tr>
+            <tr><td>Main risk</td><td>Rigidity if objectives are too narrow</td><td>Variation if coherence is weak</td><td>High demand on teacher expertise and consistency</td></tr>
+          </table>
+          <div class="exam-box"><b>High-quality comparison:</b> Do not simply list three models. Choose one criterion—such as teacher autonomy, assessment alignment or flexibility—and analyse how each model behaves under that criterion.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>2.7 Rational, bounded and dynamic/interaction approaches</summary>
+        <div class="study-body">
+          <p><b>Rational/objective approaches</b> emphasise orderly planning and alignment. <b>Bounded approaches</b> recognise that curriculum development occurs within constraints such as policy, time, resources and institutional expectations. <b>Dynamic/interaction approaches</b> emphasise that curriculum components can influence one another iteratively rather than follow a simple one-way sequence.</p>
+          <p>In real curriculum work, designers often combine planned structure with iterative adjustment. The useful question is therefore not “Which model is perfect?” but “Which design logic is appropriate for the purpose and context?”</p>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>2.8 Vertical and horizontal dimensions</summary>
+        <div class="study-body">
+          <p><b>Vertical organisation</b> considers progression across year levels: what pupils learn earlier, how ideas develop and what prior knowledge is assumed.</p>
+          <p><b>Horizontal organisation</b> considers relationships across subjects, strands or learning experiences at a similar stage.</p>
+          <div class="example-box"><b>Vertical example:</b> place value → operations → decimals → percentage.<br><b>Horizontal example:</b> linking measurement, data and science in an integrated project.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>2.9 Self-check and exam practice</summary>
+        <div class="study-body">
+          <div class="selfcheck"><b>Question:</b> A curriculum has very clear objectives but teachers cannot adapt tasks to pupil misconceptions. Which design strength and limitation are visible?</div>
+          <div class="selfcheck"><b>Question:</b> Explain why strong vertical progression is important in mathematics, where many later concepts depend on prerequisite understanding.</div>
+          <div class="exam-box"><b>C4 answer frame:</b> Identify model/principle → explain its internal logic → analyse impact on teaching/assessment → discuss trade-off → apply to primary mathematics.</div>
+        </div>
+      </details>`
+  },
+
+  {
+    title:'Topic 3 — Development of Mathematics Curriculum in Malaysian Schools',
+    sub:'Malaysian curriculum concepts, drivers of change, reform history and teacher preparation',
+    html:`
+      <div class="study-intro">
+        <h3>Topic 3 Study Module</h3>
+        <p>This topic examines Malaysian mathematics curriculum development as a process of reform. Instead of memorising a timeline, focus on why curricula change, what each reform attempts to improve and what implementation tensions may follow.</p>
+        <div class="study-objectives">
+          <div class="objective"><span>✓</span><span>Explain major factors influencing mathematics curriculum change in Malaysia.</span></div>
+          <div class="objective"><span>✓</span><span>Trace the broad reform sequence from traditional mathematics to standards-based curriculum.</span></div>
+          <div class="objective"><span>✓</span><span>Analyse curriculum reform as a response to national, learner and disciplinary needs.</span></div>
+          <div class="objective"><span>✓</span><span>Connect curriculum reform with teacher preparation and classroom implementation.</span></div>
+        </div>
+        <div class="tag-row"><span class="mini-tag">CLO1</span><span class="mini-tag">C4 Analyse</span><span class="mini-tag">Malaysia</span></div>
+      </div>
+
+      <details class="study-sec" open>
+        <summary>3.1 Why mathematics curricula change</summary>
+        <div class="study-body">
+          <p>A mathematics curriculum is shaped by more than mathematical content. Reform may respond to changes in national aspirations, economic needs, educational philosophy, understandings of how children learn and developments within mathematics education.</p>
+          <table class="key-table">
+            <tr><th>Driver</th><th>Key question</th><th>Possible curriculum effect</th></tr>
+            <tr><td><b>National aspirations and needs</b></td><td>What capabilities does the country expect future citizens to have?</td><td>Greater emphasis on problem solving, STEM, digital competence, reasoning or application.</td></tr>
+            <tr><td><b>Learning needs of children</b></td><td>What helps pupils understand mathematics meaningfully?</td><td>Greater use of representations, inquiry, differentiated support or contextual learning.</td></tr>
+            <tr><td><b>Needs of mathematics as a subject</b></td><td>What mathematical knowledge and practices should be developed?</td><td>Attention to conceptual structure, processes, reasoning, fluency and connections among topics.</td></tr>
+          </table>
+          <div class="exam-box"><b>C4 insight:</b> Curriculum change often represents a negotiation among these drivers. Improving one priority may create pressure elsewhere—for example, adding new competencies without reducing content can increase curriculum overload.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>3.2 Broad reform sequence</summary>
+        <div class="study-body">
+          <p>The course outline identifies a broad development sequence:</p>
+          <ol>
+            <li><b>Traditional Mathematics</b> — dominant until around 1970.</li>
+            <li><b>Modern Mathematics</b> — associated with the 1970s.</li>
+            <li><b>New Mathematics</b> — early 1980s.</li>
+            <li><b>Integrated Mathematics</b> — late 1980s.</li>
+            <li><b>Teaching Mathematics in English</b> — beginning in 2003 as part of a wider policy context.</li>
+            <li><b>Mathematics Standard Curriculum</b> — beginning in 2011, with standards, focus and teaching-learning expectations.</li>
+            <li><b>Later development toward KP2027</b> — competency-oriented curriculum direction identified in the course.</li>
+          </ol>
+          <div class="misconception"><b>Do not treat this as a list of dates only.</b> In an examination or tutorial, connect reform to changes in curriculum philosophy, structure, pedagogy, assessment or national priorities.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>3.3 How to analyse a curriculum reform</summary>
+        <div class="study-body">
+          <h4>Use the 5-question reform lens</h4>
+          <ol>
+            <li><b>Problem:</b> What educational issue or need was the reform responding to?</li>
+            <li><b>Change:</b> What changed in content, pedagogy, assessment or curriculum structure?</li>
+            <li><b>Assumption:</b> What view of mathematics learning appears to underpin the change?</li>
+            <li><b>Implementation:</b> What does the reform require teachers and schools to do differently?</li>
+            <li><b>Consequence:</b> What new benefit or challenge may result?</li>
+          </ol>
+          <div class="example-box"><b>Example of analytical writing:</b> “A move from content coverage toward standards and mathematical processes changes the teacher's role from completing topics to ensuring evidence of learner attainment. This increases the importance of assessment literacy because teachers must interpret performance rather than merely finish the syllabus.”</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>3.4 Teacher preparation and NCTM connection</summary>
+        <div class="study-body">
+          <p>The course includes NCTM standards for mathematics teacher preparation. The important curriculum connection is that reform cannot be separated from teacher capacity.</p>
+          <p>A curriculum may call for reasoning, discourse, problem solving, technology and responsive assessment. Teachers therefore need more than procedural content knowledge; they need pedagogical content knowledge, knowledge of learners, task design and assessment competence.</p>
+          <div class="exam-box"><b>Analytical relationship:</b> Curriculum ambition ↑ without corresponding teacher capacity → implementation gap may ↑.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>3.5 Continuity and change</summary>
+        <div class="study-body">
+          <p>Curriculum reform contains both <b>change</b> and <b>continuity</b>. Core mathematical domains remain important, but expectations for how pupils engage with mathematics may shift. This distinction prevents simplistic claims such as “the old curriculum was traditional and the new curriculum is completely different.”</p>
+          <h4>Analyse continuity in:</h4>
+          <ul><li>core number and operations knowledge</li><li>progression of mathematical concepts</li><li>need for fluency and accuracy</li></ul>
+          <h4>Analyse change in:</h4>
+          <ul><li>mathematical processes</li><li>assessment expectations</li><li>technology integration</li><li>competency and application</li><li>learner-centred pedagogy</li></ul>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>3.6 Tutorial and exam practice</summary>
+        <div class="study-body">
+          <div class="selfcheck"><b>Tutorial:</b> Select one major Malaysian mathematics curriculum reform. Analyse it using the 5-question reform lens.</div>
+          <div class="selfcheck"><b>Exam-style:</b> Analyse how national aspirations and pupils' learning needs can create both complementary and competing pressures in mathematics curriculum design.</div>
+          <div class="exam-box"><b>Good answer:</b> Do not only state factors. Show how the factors influence curriculum choices and why tension may arise.</div>
+        </div>
+      </details>`
+  },
+
+  {
+    title:'Topic 4 — The Study of Mathematics Primary School Curriculum in Malaysia',
+    sub:'KSSR, DSKP, Fikrah Matematik, standards, assessment, KP2027 and pedagogy',
+    html:`
+      <div class="study-intro">
+        <h3>Topic 4 Study Module</h3>
+        <p>This topic examines the structure and intent of Malaysian primary mathematics curriculum, including KSSR/DSKP, Fikrah Matematik, standards, classroom assessment, HOTS, KP2027 and contemporary approaches such as IBME, project-based learning and computational thinking.</p>
+        <div class="study-objectives">
+          <div class="objective"><span>✓</span><span>Interpret the components of DSKP Mathematics and how they work together.</span></div>
+          <div class="objective"><span>✓</span><span>Differentiate Content Standards, Learning Standards and Performance Standards.</span></div>
+          <div class="objective"><span>✓</span><span>Explain Fikrah Matematik as a broader orientation toward mathematical learning.</span></div>
+          <div class="objective"><span>✓</span><span>Analyse pedagogical and assessment implications of KSSR and KP2027 directions.</span></div>
+        </div>
+        <div class="tag-row"><span class="mini-tag">CLO1</span><span class="mini-tag">CLO2</span><span class="mini-tag">CLO3</span><span class="mini-tag">Malaysia Core</span></div>
+      </div>
+
+      <details class="study-sec" open>
+        <summary>4.1 Understanding DSKP as a curriculum-and-assessment document</summary>
+        <div class="study-body">
+          <p>The <b>Dokumen Standard Kurikulum dan Pentaksiran (DSKP)</b> brings curriculum expectations and assessment standards together. This is important because teaching and assessment should not be treated as unrelated activities.</p>
+          <p>For analysis, ask whether there is alignment among:</p>
+          <p><b>Curriculum aims → Content → Learning Standards → Teaching tasks → Evidence of learning → Performance judgement</b></p>
+          <div class="example-box"><b>Example:</b> If a Learning Standard requires pupils to explain a strategy, an assessment that asks only for a final numerical answer provides incomplete evidence.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>4.2 Philosophy, aims and objectives</summary>
+        <div class="study-body">
+          <p>Curriculum philosophy gives direction to what kind of mathematical learner the system intends to develop. Aims translate this broad direction into educational priorities, while objectives or standards provide more specific expectations for learning.</p>
+          <p>When studying aims, do not merely reproduce wording. Ask:</p>
+          <ul>
+            <li>What conception of mathematics is implied—facts and procedures only, or also reasoning, communication and application?</li>
+            <li>What learner dispositions are valued?</li>
+            <li>How should the aims influence classroom pedagogy and assessment?</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>4.3 Fikrah Matematik</summary>
+        <div class="study-body">
+          <p><b>Fikrah Matematik</b> can be studied as an orientation toward developing mathematically capable learners through interconnected knowledge, skills, processes and values rather than treating mathematics as isolated procedures.</p>
+          <p>The course outline places Fikrah Matematik alongside learning areas, processes, skills and values within the Mathematics Curriculum Framework. Therefore, use it as an organising idea when explaining how mathematical understanding, reasoning and dispositions are intended to work together.</p>
+          <div class="exam-box"><b>C4 prompt:</b> Analyse why a curriculum framework needs both mathematical content and mathematical processes. What would be lost if one were emphasised without the other?</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>4.4 Learning areas, processes, skills and values</summary>
+        <div class="study-body">
+          <p><b>Learning areas</b> organise mathematical content. <b>Processes</b> concern how pupils engage mathematically—for example reasoning, problem solving or communication. <b>Skills</b> concern capabilities needed to work mathematically, while <b>values</b> shape dispositions toward learning and responsible participation.</p>
+          <div class="example-box"><b>Integrated example:</b> A measurement investigation may involve content knowledge of length, reasoning about units, communicating methods, using tools accurately and demonstrating perseverance.</div>
+          <p>Strong curriculum implementation connects these dimensions within tasks instead of teaching each as a separate list.</p>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>4.5 Content Standards, Learning Standards and Performance Standards</summary>
+        <div class="study-body">
+          <table class="key-table">
+            <tr><th>Standard</th><th>Purpose</th><th>Question to ask</th></tr>
+            <tr><td><b>Content Standard</b></td><td>Broad statement of what pupils should know or be able to do within an area.</td><td>What major content or capability is intended?</td></tr>
+            <tr><td><b>Learning Standard</b></td><td>More specific learning expectation that guides teaching and evidence collection.</td><td>What should pupils demonstrate?</td></tr>
+            <tr><td><b>Performance Standard</b></td><td>Describes levels or quality of pupil mastery/performance.</td><td>How well has the pupil demonstrated the intended learning?</td></tr>
+          </table>
+          <div class="misconception"><b>Common mistake:</b> Treating Performance Standards as another list of content. Their role is to support judgement about the quality or level of demonstrated learning.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>4.6 Teaching, learning and classroom assessment</summary>
+        <div class="study-body">
+          <p>Curriculum implementation requires alignment between pedagogical strategy and intended learning. Different mathematical goals need different evidence.</p>
+          <table class="key-table">
+            <tr><th>Goal</th><th>Possible learning experience</th><th>Useful evidence</th></tr>
+            <tr><td>Procedural fluency</td><td>Purposeful practice with feedback</td><td>Accuracy, efficiency and method</td></tr>
+            <tr><td>Conceptual understanding</td><td>Representations, explanation and connection tasks</td><td>Models, explanations, error analysis</td></tr>
+            <tr><td>Reasoning</td><td>Justify, compare strategies, identify patterns</td><td>Arguments and explanations</td></tr>
+            <tr><td>Problem solving</td><td>Non-routine or contextual tasks</td><td>Strategy selection, adaptation, justification</td></tr>
+          </table>
+          <div class="exam-box"><b>Analysis point:</b> A mismatch between learning objective and evidence can produce invalid conclusions about pupil achievement.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>4.7 HOTS in mathematics</summary>
+        <div class="study-body">
+          <p>Higher-order thinking should not be reduced to “hard questions.” HOTS involves cognitive demand such as analysing relationships, evaluating strategies, generalising, justifying or creating approaches.</p>
+          <h4>Compare the demand</h4>
+          <p><b>Lower demand:</b> Calculate 36 × 8.</p>
+          <p><b>Higher demand:</b> Two pupils use different methods for 36 × 8. Compare the methods, explain why both work and decide which is more efficient under a stated criterion.</p>
+          <p>The second task requires interpretation, comparison and judgement, not simply larger numbers.</p>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>4.8 KP2027 direction in this course</summary>
+        <div class="study-body">
+          <p>The MTES7013 course outline highlights three KP2027 directions for study:</p>
+          <ul>
+            <li><b>Character Development</b></li>
+            <li><b>Integrated Learning</b></li>
+            <li><b>Competency-Oriented Curriculum</b></li>
+          </ul>
+          <p>For primary mathematics, analyse what these directions could require in curriculum enactment: learning should connect mathematical knowledge with responsible dispositions, cross-domain application and demonstrated competencies rather than content recall alone.</p>
+          <div class="example-box"><b>Integrated task example:</b> Pupils plan a healthy class snack budget. Mathematics includes money, operations and data; integrated learning may connect health and communication; competency is demonstrated through applying mathematics to make and justify decisions.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>4.9 IBME, Project-Based Learning and Computational Thinking</summary>
+        <div class="study-body">
+          <h4>Inquiry-Based Mathematics Education (IBME)</h4>
+          <p>Pupils explore mathematical relationships, conjecture, test ideas, explain patterns and justify conclusions. Teacher guidance remains important; inquiry is not simply “letting pupils discover everything alone.”</p>
+          <h4>Project-Based Learning</h4>
+          <p>Pupils use mathematics within an extended purposeful task or product. The curriculum challenge is ensuring that mathematics remains explicit and assessable rather than becoming secondary to the project theme.</p>
+          <h4>Computational Thinking</h4>
+          <p>Computational thinking can involve decomposition, pattern recognition, abstraction and algorithmic thinking. In mathematics, these processes may support structured problem solving without requiring every activity to involve coding.</p>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>4.10 Reasoning, remediation, enrichment and special needs</summary>
+        <div class="study-body">
+          <p><b>Reasoning</b> requires pupils to explain why, not only produce answers. <b>Remediation</b> addresses foundational gaps with targeted support. <b>Enrichment</b> extends depth or complexity rather than simply giving more of the same work.</p>
+          <p>For pupils with special educational needs, curriculum access may require adapted representations, scaffolding, pacing, assistive tools or alternative response modes while preserving meaningful mathematical goals.</p>
+          <div class="exam-box"><b>C4 issue:</b> Equity is not identical treatment. Analyse how differentiated access can support common curriculum intentions without lowering expectations unnecessarily.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>4.11 IR 4.0 and technology in mathematics curriculum</summary>
+        <div class="study-body">
+          <p>The course identifies IR 4.0 as a curriculum consideration. Technology can support visualisation, feedback, data handling and exploration, but it should be selected according to mathematical purpose.</p>
+          <p><b>Good curriculum question:</b> What mathematical thinking becomes possible or more visible through the technology?</p>
+          <p><b>Poor curriculum question:</b> Which app looks most impressive?</p>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>4.12 DSKP analysis practice</summary>
+        <div class="study-body">
+          <div class="selfcheck"><b>Choose one Learning Standard and analyse:</b><ol><li>What mathematical concept is intended?</li><li>What prior knowledge is required?</li><li>Which mathematical process should be visible?</li><li>What task would provide valid evidence?</li><li>How could HOTS be incorporated without changing the core standard?</li><li>What support may be needed for diverse learners?</li></ol></div>
+        </div>
+      </details>`
+  },
+
+  {
+    title:'Topic 5 — Comparative Analysis of Primary Mathematics Curricula',
+    sub:'Curriculum mapping, learning standards, international comparison and assessment frameworks',
+    html:`
+      <div class="study-intro">
+        <h3>Topic 5 Study Module</h3>
+        <p>This topic prepares you for the 30% Comparative Curriculum Evaluation Report. The emphasis is not on declaring that one country is “better,” but on comparing curriculum features using explicit criteria, credible evidence and contextual judgement.</p>
+        <div class="study-objectives">
+          <div class="objective"><span>✓</span><span>Map learning areas and relationships among curriculum strands.</span></div>
+          <div class="objective"><span>✓</span><span>Interpret learning outcomes and standards in context.</span></div>
+          <div class="objective"><span>✓</span><span>Compare Malaysia with Singapore, England, Finland, British Columbia or Australia using focused criteria.</span></div>
+          <div class="objective"><span>✓</span><span>Explain how international assessments can inform—but not determine—curriculum judgement.</span></div>
+        </div>
+        <div class="tag-row"><span class="mini-tag">CLO2</span><span class="mini-tag">C5 Evaluate</span><span class="mini-tag">30% Report</span></div>
+      </div>
+
+      <details class="study-sec" open>
+        <summary>5.1 What does curriculum comparison mean?</summary>
+        <div class="study-body">
+          <p>Comparative curriculum analysis examines similarities, differences and underlying assumptions across curricula. Evaluation goes further by making a reasoned judgement using a stated criterion.</p>
+          <h4>Weak comparison</h4>
+          <p>“Malaysia has learning standards. Country X also has learning standards.”</p>
+          <h4>Stronger comparison</h4>
+          <p>“Both systems specify learning expectations, but they organise progression differently. This difference matters because it influences how clearly teachers can trace conceptual development across year levels.”</p>
+          <h4>Evaluation</h4>
+          <p>“Under the criterion of progression clarity, one structure may be more useful; however, the judgement must be supported by official documents and interpreted within the Malaysian context.”</p>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>5.2 Curriculum mapping</summary>
+        <div class="study-body">
+          <p>Curriculum mapping makes the structure visible. It may identify:</p>
+          <ul>
+            <li>learning areas or strands</li>
+            <li>sequence across year levels</li>
+            <li>relationships among learning areas</li>
+            <li>learning outcomes or standards</li>
+            <li>mathematical processes</li>
+            <li>assessment expectations</li>
+          </ul>
+          <div class="example-box"><b>Mapping question:</b> Does ratio appear as an isolated topic, or is it connected progressively with fractions, decimals, percentage and proportional reasoning?</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>5.3 Interpreting learning outcomes and learning standards</summary>
+        <div class="study-body">
+          <p>When comparing statements from two curricula, examine more than wording. Consider:</p>
+          <ol>
+            <li><b>Content:</b> What mathematical idea is targeted?</li>
+            <li><b>Action:</b> What must pupils do—calculate, explain, justify, model, investigate?</li>
+            <li><b>Cognitive demand:</b> What level of reasoning is implied?</li>
+            <li><b>Progression:</b> How does this expectation connect to earlier and later learning?</li>
+            <li><b>Assessment implication:</b> What evidence would demonstrate attainment?</li>
+          </ol>
+          <div class="misconception"><b>Common mistake:</b> Treating two standards as equivalent merely because they mention the same topic. Their cognitive demand and expected mathematical processes may differ.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>5.4 Choosing comparison criteria</summary>
+        <div class="study-body">
+          <table class="key-table">
+            <tr><th>Criterion</th><th>What to examine</th></tr>
+            <tr><td>Aims / philosophy</td><td>What kind of mathematical learner is intended?</td></tr>
+            <tr><td>Content organisation</td><td>How are strands structured and sequenced?</td></tr>
+            <tr><td>Mathematical processes</td><td>How are reasoning, problem solving, communication or modelling positioned?</td></tr>
+            <tr><td>Pedagogy</td><td>What learning approaches are encouraged or implied?</td></tr>
+            <tr><td>Assessment</td><td>What evidence is valued and how is progression judged?</td></tr>
+            <tr><td>HOTS</td><td>Where is higher cognitive demand visible?</td></tr>
+            <tr><td>Technology</td><td>How is digital technology connected to mathematical learning?</td></tr>
+            <tr><td>Inclusion / equity</td><td>How does the curriculum address learner diversity or access?</td></tr>
+          </table>
+          <div class="exam-box"><b>Report advice:</b> A 1200-word report cannot evaluate everything. Select two or three criteria that allow meaningful evidence-based judgement.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>5.5 The C5 evaluation chain</summary>
+        <div class="study-body">
+          <p><b>Criterion → Evidence → Comparison → Interpretation → Judgement → Contextual qualification → Recommendation</b></p>
+          <div class="example-box"><b>Sentence pattern:</b> “Under the criterion of ___, Curriculum A places greater emphasis on ___, as shown by ___. In comparison, Curriculum B ___. This difference is significant because ___. Therefore, ___ appears stronger for ___; however, adaptation to Malaysia would require consideration of ___.”</div>
+          <p>This structure helps prevent descriptive writing from masquerading as evaluation.</p>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>5.6 International assessment frameworks in the course</summary>
+        <div class="study-body">
+          <p>The course identifies <b>TIMSS, PISA, SEA-PLM, AMPL and ICAS Mathematics</b> as assessment contexts to be considered when examining mathematics curriculum.</p>
+          <h4>How to use them academically</h4>
+          <ul>
+            <li>Understand what each assessment is intended to measure.</li>
+            <li>Distinguish curriculum assessment from curriculum itself.</li>
+            <li>Use results cautiously as one form of evidence, not as proof that a whole curriculum is superior.</li>
+            <li>Consider differences in population, purpose, sampling, assessment design and context.</li>
+          </ul>
+          <div class="misconception"><b>Do not write:</b> “Country A scored higher in PISA, therefore its curriculum is better.” Performance is influenced by many factors beyond the written curriculum.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>5.7 Global citizenship and contextual transfer</summary>
+        <div class="study-body">
+          <p>The course links this topic with global citizenship. Comparative study can broaden professional perspectives, but international practices should be adapted rather than copied mechanically.</p>
+          <h4>Before recommending a practice, ask:</h4>
+          <ul>
+            <li>Does it address a genuine Malaysian curriculum need?</li>
+            <li>What teacher knowledge or resources does it require?</li>
+            <li>Is it culturally and institutionally appropriate?</li>
+            <li>What would need modification for Malaysian classrooms?</li>
+            <li>What evidence suggests that the practice would improve mathematical learning?</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>5.8 Report planning activity</summary>
+        <div class="study-body">
+          <div class="selfcheck"><b>Build your matrix:</b><table class="key-table"><tr><th>Criterion</th><th>Malaysia evidence</th><th>Selected country evidence</th><th>Interpretation</th><th>Judgement</th></tr><tr><td>e.g. Mathematical reasoning</td><td>Insert verified source</td><td>Insert verified source</td><td>Explain meaningful difference</td><td>State contextual judgement</td></tr></table></div>
+          <div class="exam-box"><b>C5 test:</b> If your paragraph could be written without evidence from either curriculum, it is probably too generic for comparative evaluation.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>5.9 Source discipline</summary>
+        <div class="study-body">
+          <p>Prioritise official curriculum documents for claims about curriculum structure and standards. Use peer-reviewed research for interpretation, implementation or impact claims. Use international reports carefully when discussing comparative performance.</p>
+          <div class="callout warn"><b>Academic integrity:</b> Never invent a curriculum fact, DOI, author, policy statement or assessment result. If a claim is not supported, label it as requiring evidence.</div>
+        </div>
+      </details>`
+  },
+
+  {
+    title:'Topic 6 — Trends, Issues and Challenges in Primary Mathematics Curriculum',
+    sub:'Technology and AI, pedagogy, equity, assessment, learning loss, PCK and language',
+    html:`
+      <div class="study-intro">
+        <h3>Topic 6 Study Module</h3>
+        <p>This topic supports CLO3 and the 20% group presentation. Your task is to move from identifying a trend or problem to evaluating its significance, evidence, curriculum implications and feasible response.</p>
+        <div class="study-objectives">
+          <div class="objective"><span>✓</span><span>Differentiate a trend, issue and challenge.</span></div>
+          <div class="objective"><span>✓</span><span>Evaluate technology, AI, pedagogy, equity and assessment developments in primary mathematics.</span></div>
+          <div class="objective"><span>✓</span><span>Analyse systemic challenges such as learning loss, disparities, PCK and language.</span></div>
+          <div class="objective"><span>✓</span><span>Construct an evidence-based presentation with a justified recommendation.</span></div>
+        </div>
+        <div class="tag-row"><span class="mini-tag">CLO3</span><span class="mini-tag">C5 Evaluate</span><span class="mini-tag">20% Presentation</span></div>
+      </div>
+
+      <details class="study-sec" open>
+        <summary>6.1 Trend, issue or challenge?</summary>
+        <div class="study-body">
+          <table class="key-table">
+            <tr><th>Term</th><th>Meaning for study</th><th>Example</th></tr>
+            <tr><td><b>Trend</b></td><td>A direction of change gaining attention or adoption.</td><td>Use of AI-assisted adaptive learning or dynamic visualisation.</td></tr>
+            <tr><td><b>Issue</b></td><td>A matter requiring educational judgement or debate.</td><td>How assessment should balance mastery, reasoning and accountability.</td></tr>
+            <tr><td><b>Challenge</b></td><td>A barrier that makes curriculum goals difficult to achieve.</td><td>Teacher PCK, learning loss or urban-rural resource disparity.</td></tr>
+          </table>
+          <p>The same topic can operate in more than one category. For example, AI is a trend, but equitable access and academic integrity may become issues or challenges.</p>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>6.2 Technology and AI</summary>
+        <div class="study-body">
+          <p>The course identifies <b>AI and adaptive learning, dynamic visualisation, GeoGebra, Desmos and gamification</b> as current trends.</p>
+          <h4>Potential curriculum value</h4>
+          <ul>
+            <li>Immediate or adaptive feedback</li>
+            <li>Multiple representations</li>
+            <li>Dynamic exploration of mathematical relationships</li>
+            <li>Additional practice opportunities</li>
+            <li>Data for formative assessment</li>
+          </ul>
+          <h4>Risks and questions</h4>
+          <ul>
+            <li>Does technology deepen mathematical thinking or merely increase engagement?</li>
+            <li>Are pupils reasoning or simply following automated prompts?</li>
+            <li>Are access and connectivity equitable?</li>
+            <li>Can teachers interpret data and integrate the tool pedagogically?</li>
+          </ul>
+          <div class="exam-box"><b>C5 position:</b> Avoid “technology is good.” Evaluate under explicit criteria such as learning value, accessibility, teacher readiness, cost and curriculum alignment.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>6.3 Dynamic visualisation</summary>
+        <div class="study-body">
+          <p>Dynamic tools can make mathematical relationships visible. For example, pupils can manipulate geometric objects, observe invariance, test conjectures or examine graphs interactively.</p>
+          <p>However, visualisation is educationally useful only when tasks direct attention to mathematical structure. Moving sliders without prediction, explanation or generalisation may produce activity without learning.</p>
+          <div class="example-box"><b>Better task:</b> “Predict what remains unchanged when the vertex moves. Test your prediction using GeoGebra. Explain why the property remains invariant.”</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>6.4 Gamification</summary>
+        <div class="study-body">
+          <p>Gamification uses game-like elements such as points, levels, challenges, feedback or progress indicators. It can increase participation and practice, but curriculum evaluation should examine what behaviour is being rewarded.</p>
+          <p>If rewards prioritise speed only, pupils may infer that fast answers are more important than reasoning. If challenges reward explanation, strategic choice and persistence, the design can better align with broader mathematics goals.</p>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>6.5 Pedagogy and curriculum shift</summary>
+        <div class="study-body">
+          <p>The course highlights student-centred approaches including inquiry-based and problem-based learning. A curriculum shift is meaningful only if classroom roles, tasks and assessment also change.</p>
+          <h4>Teacher role does not disappear</h4>
+          <p>Student-centred learning still requires purposeful task selection, questioning, scaffolding, monitoring and consolidation. Poorly guided “discovery” can leave misconceptions unresolved.</p>
+          <div class="misconception"><b>Common misconception:</b> Student-centred = teacher does less. More accurately, the teacher's work shifts from mainly explaining procedures to designing and orchestrating learning.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>6.6 Professional Learning Community (PLC)</summary>
+        <div class="study-body">
+          <p>A PLC can support curriculum implementation by enabling teachers to examine pupil work, co-design tasks, discuss misconceptions, moderate assessment and share pedagogical strategies.</p>
+          <p>The critical issue is whether collaboration focuses on evidence of pupil learning or becomes administrative sharing without instructional improvement.</p>
+          <div class="exam-box"><b>Evaluation criterion:</b> Judge PLC effectiveness by the quality of professional inquiry and impact on teaching decisions, not merely frequency of meetings.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>6.7 21st-century and real-world learning</summary>
+        <div class="study-body">
+          <p>Real-world or contextual learning can make mathematics purposeful and support application. However, context should not obscure the mathematical idea.</p>
+          <p>A “real-life” task is not automatically high quality. Evaluate whether pupils must mathematise the situation, make decisions, interpret results and justify conclusions.</p>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>6.8 Equity and inclusion</summary>
+        <div class="study-body">
+          <p>Equity asks whether different learners have meaningful opportunities to access and succeed in mathematics. Curriculum implementation can be affected by socioeconomic conditions, geography, language, disability, technology access and prior learning.</p>
+          <p><b>Equality</b> gives the same provision. <b>Equity</b> considers whether different support is needed to achieve meaningful access to common learning goals.</p>
+          <div class="example-box"><b>Example:</b> Providing only an online dynamic mathematics platform may increase opportunity for some pupils while disadvantaging pupils with limited connectivity unless an alternative access strategy is designed.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>6.9 Declining performance and learning loss</summary>
+        <div class="study-body">
+          <p>Performance decline or learning loss should be analysed carefully. Scores describe an outcome; they do not identify a single cause.</p>
+          <p>Possible interacting factors may include interrupted learning, prerequisite gaps, curriculum pacing, attendance, instructional quality, assessment alignment, home support and learner affect.</p>
+          <div class="misconception"><b>Avoid causal overclaim:</b> “Scores declined because the curriculum is weak.” Evidence is needed to distinguish curriculum design from implementation and contextual factors.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>6.10 Curriculum and pedagogical pressures</summary>
+        <div class="study-body">
+          <p>Teachers may face tension among curriculum breadth, limited instructional time, assessment expectations, diverse learner needs and expectations for innovative pedagogy.</p>
+          <p>When content pressure is high, teachers may prioritise coverage over depth. This can reduce time for reasoning, problem solving and formative assessment even when the written curriculum values them.</p>
+          <div class="exam-box"><b>Systemic analysis:</b> Curriculum overload is not only a teacher problem. It can emerge from the interaction among curriculum scope, time, assessment and accountability.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>6.11 Teacher PCK and language</summary>
+        <div class="study-body">
+          <p><b>Pedagogical Content Knowledge (PCK)</b> involves knowing how to represent mathematical ideas, anticipate misconceptions, select examples, ask productive questions and respond to pupil thinking.</p>
+          <p>Language also matters because mathematical learning involves specialised vocabulary, symbols, explanation and reasoning. Pupils may understand an idea but struggle to express it in the language of instruction, or may know everyday meanings that conflict with mathematical meanings.</p>
+          <div class="example-box"><b>Example:</b> Terms such as “difference,” “product,” “mean” or “volume” have mathematical meanings that require explicit language support.</div>
+        </div>
+      </details>
+
+      <details class="study-sec">
+        <summary>6.12 Build an evidence-based presentation</summary>
+        <div class="study-body">
+          <p>Use this structure:</p>
+          <ol>
+            <li><b>Define:</b> What exactly is the trend, issue or challenge?</li>
+            <li><b>Evidence:</b> What credible evidence shows it matters?</li>
+            <li><b>Impact:</b> How does it affect mathematics teaching, learning or curriculum implementation?</li>
+            <li><b>Malaysia:</b> What specific Malaysian context is relevant?</li>
+            <li><b>International perspective:</b> What comparable insight is useful?</li>
+            <li><b>Evaluate:</b> What strengths, limitations or trade-offs exist?</li>
+            <li><b>Position:</b> What is your group's justified conclusion?</li>
+            <li><b>Recommend:</b> What feasible improvement follows from the evidence?</li>
+          </ol>
+          <div class="exam-box"><b>Presentation quality test:</b> If your recommendation could be given before analysing the evidence, your argument is probably too generic.</div>
+        </div>
+      </details>`
+  }
+];
+
+const quizData = [
+  {
+    q:'Which statement best reflects a C4 analysis of Tyler’s curriculum model?',
+    options:[
+      'Tyler proposed four curriculum questions.',
+      'Tyler’s model is an objective model.',
+      'Because objectives guide learning experiences and evaluation, unclear objectives can weaken alignment across the curriculum.',
+      'Tyler’s model was developed before Taba’s model.'
+    ],
+    ans:2,
+    explain:'The third option examines a relationship and consequence, not just a fact or label.'
+  },
+  {
+    q:'Which response is strongest at C5 evaluation level?',
+    options:[
+      'Singapore emphasises problem solving.',
+      'Malaysia also includes problem solving.',
+      'Both curricula mention problem solving.',
+      'Singapore’s positioning of problem solving may offer stronger curricular coherence, but its suitability for Malaysia must be judged against local curriculum goals, teacher capacity and evidence from official documents.'
+    ],
+    ans:3,
+    explain:'C5 requires a criterion, judgement, contextual qualification and evidence-based justification.'
+  },
+  {
+    q:'Which is the safest academic practice when a source cannot be verified?',
+    options:[
+      'Create a plausible DOI.',
+      'Use the claim without citation.',
+      'State that evidence is required and verify the source before using it.',
+      'Cite a general website.'
+    ],
+    ans:2,
+    explain:'Academic integrity requires verification. Never fabricate references or DOI numbers.'
+  },
+  {
+    q:'A written curriculum promotes inquiry, but pupils mostly experience direct instruction. Which idea is most relevant?',
+    options:[
+      'The difference between intended and experienced curriculum',
+      'Only the null curriculum',
+      'Only curriculum evaluation',
+      'Only curriculum content'
+    ],
+    ans:0,
+    explain:'The scenario highlights a gap between the official/intended curriculum and enacted/experienced curriculum.'
+  },
+  {
+    q:'Which question best supports curriculum evaluation rather than description?',
+    options:[
+      'What are the learning standards?',
+      'When was the curriculum introduced?',
+      'Which curriculum approach provides stronger support for mathematical reasoning under the selected criterion, and what evidence justifies that judgement?',
+      'How many topics are included?'
+    ],
+    ans:2,
+    explain:'Evaluation requires criteria and a justified judgement supported by evidence.'
+  }
+];
+
+const criteria = ['Aims','Curriculum structure','Learning areas','Pedagogy','Problem solving','Mathematical reasoning','Assessment','HOTS','Technology','Inclusion','Teacher autonomy'];
+let selectedCriterion='Aims';
+let currentQuiz=0;
+let quizSelected=null;
+let topicIndex=0;
+
+function updateProgress(){
+  const topicPart = state.completedTopics.length / 6 * 60;
+  const quizPart = Math.min(state.quizAttempts,10)/10 * 20;
+  const reportDone = Object.values(state.reportSteps).filter(Boolean).length;
+  const reportPart = reportDone / 6 * 20;
+  const pct = Math.round(Math.min(100, topicPart+quizPart+reportPart));
+  document.getElementById('progressText').textContent = pct+'%';
+  document.getElementById('progressBar').style.width = pct+'%';
+}
+updateProgress();
+
+function openMenu(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+}
+function closeMenu(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+document.getElementById('menuBtn').onclick=openMenu;
+document.getElementById('closeMenu').onclick=closeMenu;
+document.getElementById('overlay').onclick=closeMenu;
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
+  const target = document.getElementById('view-'+name);
+  if(target) target.classList.remove('hidden');
+  document.querySelectorAll('.nav-btn[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
+  document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.go===name));
+  document.getElementById('chapterBadge').textContent = ({
+    chat:'Ask',home:'Dashboard',topics:'Topics',topicdetail:'Topic',c4:'C4',c5:'C5',compare:'Compare',report:'Report',presentation:'Presentation',exam:'Exam',quiz:'Quiz',check:'Check',sources:'Sources'
+  })[name] || 'Study';
+  closeMenu();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.go)));
+document.querySelectorAll('.nav-btn[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+
+function renderTopics(){
+  const el=document.getElementById('topicList');
+  el.innerHTML='';
+  topics.forEach((t,i)=>{
+    const done=state.completedTopics.includes(i);
+    const item=document.createElement('div');
+    item.className='topic-item';
+    item.innerHTML=`
+      <div class="topic-num">${done?'✓':i+1}</div>
+      <div class="topic-text"><h3>${t.title}</h3><p>${t.sub}</p></div>
+      <button class="small-btn">Open</button>`;
+    item.querySelector('button').onclick=()=>openTopic(i);
+    el.appendChild(item);
+  });
+}
+renderTopics();
+
+function openTopic(i){
+  topicIndex=i; state.currentTopic=i; saveState();
+  const t=topics[i];
+  document.getElementById('topicTitle').textContent=t.title;
+  document.getElementById('topicSub').textContent=t.sub;
+  document.getElementById('topicContent').innerHTML=t.html;
+  document.getElementById('markTopicDone').textContent=state.completedTopics.includes(i)?'Completed ✓':'Mark Topic Completed';
+  showView('topicdetail');
+}
+document.getElementById('markTopicDone').onclick=()=>{
+  if(!state.completedTopics.includes(topicIndex)) state.completedTopics.push(topicIndex);
+  saveState(); renderTopics();
+  document.getElementById('markTopicDone').textContent='Completed ✓';
+};
+
+function tokenCount(text, words){
+  const t=text.toLowerCase();
+  return words.reduce((n,w)=>n+(t.includes(w)?1:0),0);
+}
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function c4Analysis(text){
+  const rel = tokenCount(text,['because','therefore','leads to','results in','relationship','align','alignment','affects','influences','consequence','whereas','while','however','compared']);
+  const structure = tokenCount(text,['objective','experience','evaluation','process','teacher','learner','assessment','curriculum','model']);
+  const score=Math.min(5, Math.max(1, Math.round((rel*1.5+Math.min(structure,4))/2)));
+  let level=score>=4?'Strong C4 characteristics':score>=3?'Developing C4 analysis':'Mostly descriptive';
+  const prompts=[];
+  if(!/because|therefore|affect|influenc|consequence|leads to/i.test(text)) prompts.push('Explain why the feature matters or what consequence follows.');
+  if(!/compare|whereas|while|however|different|similar/i.test(text)) prompts.push('Introduce a meaningful contrast or relationship.');
+  if(!/assumption|assumes|underlying/i.test(text)) prompts.push('Identify an assumption underlying the model or curriculum feature.');
+  return {score,level,prompts};
+}
+document.getElementById('runC4').onclick=()=>{
+  const text=document.getElementById('c4Text').value.trim();
+  const out=document.getElementById('c4Feedback');
+  if(!text){out.classList.remove('hidden');out.innerHTML='Paste an answer first.';return}
+  const r=c4Analysis(text);
+  out.classList.remove('hidden');
+  out.innerHTML=`<b>${r.level}</b><br>C4 indicator: <b>${r.score}/5</b><br><br>${r.prompts.length?'<b>Improve by:</b><ul>'+r.prompts.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'Good analytical movement. Next, make sure your claims are supported by accurate course evidence.'}`;
+};
+document.getElementById('c4Prompt').onclick=()=>{
+  const prompts=[
+    'Analyse how Tyler’s objectives influence the selection of learning experiences and evaluation.',
+    'Analyse the relationship between the official mathematics curriculum and the curriculum pupils actually experience in classrooms.',
+    'Compare Tyler and Stenhouse in terms of teacher autonomy and curriculum flexibility.',
+    'Analyse why curriculum reform can fail even when the written curriculum is well designed.'
+  ];
+  document.getElementById('c4Text').value=prompts[Math.floor(Math.random()*prompts.length)];
+};
+
+function c5Evaluate(text){
+  const checks=[
+    ['Comparison',/compare|compared|whereas|while|difference|similar|both|unlike/i],
+    ['Evidence',/evidence|according to|document|study|data|report|source|doi|oecd|timss|pisa/i],
+    ['Strength',/strength|advantage|benefit|effective|supports|enables/i],
+    ['Limitation',/limitation|constraint|however|although|risk|challenge|weakness/i],
+    ['Judgement',/therefore|thus|more appropriate|stronger|better suited|preferable|justified|suggests/i],
+    ['Justification',/because|due to|given that|in the context|considering|therefore/i]
+  ];
+  return checks.map(([name,re])=>({name,score:re.test(text)?3:0}));
+}
+document.getElementById('runC5').onclick=()=>{
+  const text=document.getElementById('c5Text').value.trim(), out=document.getElementById('c5Feedback');
+  if(!text){out.classList.remove('hidden');out.textContent='Paste a paragraph first.';return}
+  const scores=c5Evaluate(text);
+  const missing=scores.filter(s=>s.score===0).map(s=>s.name);
+  out.classList.remove('hidden');
+  out.innerHTML=`
+    <b>C5 evaluation profile</b>
+    <div class="score-grid">${scores.map(s=>`<div class="score"><b>${s.name}</b><span>${s.score}/3</span></div>`).join('')}</div>
+    <br>${missing.length?`<b>Main gaps:</b> ${missing.join(', ')}.<br><br>Revise by adding these elements rather than merely expanding description.`:'Your paragraph shows the main features of evaluation. Check that the evidence is genuine and the judgement is contextually justified.'}`;
+};
+
+const chips=document.getElementById('criteriaChips');
+criteria.forEach((c,i)=>{
+  const b=document.createElement('button');b.className='chip'+(i===0?' active':'');b.textContent=c;
+  b.onclick=()=>{selectedCriterion=c;document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));b.classList.add('active')};
+  chips.appendChild(b);
+});
+document.getElementById('buildCompare').onclick=()=>{
+  const a=document.getElementById('countryA').value,b=document.getElementById('countryB').value,out=document.getElementById('compareOutput');
+  out.classList.remove('hidden');
+  out.innerHTML=`
+    <b>${a} vs ${b}: ${selectedCriterion}</b>
+    <div class="compare-grid" style="margin-top:10px">
+      <div class="compare-col"><h4>${a}</h4><p>Record what the official curriculum says about <b>${selectedCriterion.toLowerCase()}</b>. Use an official or verified source.</p></div>
+      <div class="compare-col"><h4>${b}</h4><p>Record equivalent evidence for <b>${selectedCriterion.toLowerCase()}</b>. Avoid relying on general impressions.</p></div>
+    </div>
+    <h4>Analysis</h4>
+    <ul><li>What meaningful similarity exists?</li><li>What important difference exists?</li><li>Why does that difference matter educationally?</li></ul>
+    <h4>Evaluation</h4>
+    <ul><li>Which approach is stronger under this criterion?</li><li>What evidence supports that judgement?</li><li>What limitation or contextual constraint applies?</li><li>What could Malaysia adapt without simply copying?</li></ul>`;
+};
+
+const reportStages=[
+  ['1','Select an international curriculum','Choose one curriculum for focused comparison.'],
+  ['2','Choose comparison criteria','Limit the report to criteria that allow meaningful C5 evaluation.'],
+  ['3','Gather verified evidence','Use official documents and credible academic sources.'],
+  ['4','Build a comparison matrix','Record similarity, difference, evidence and significance.'],
+  ['5','Make evaluative judgements','Identify strengths, limitations and contextual relevance.'],
+  ['6','Justify one alternative practice','Explain what Malaysia could adapt, why, and under what constraints.']
+];
+function renderReport(){
+  const el=document.getElementById('reportSteps');
+  el.innerHTML='<h3>Report workflow</h3>';
+  reportStages.forEach(([n,t,d])=>{
+    const done=!!state.reportSteps[n];
+    const row=document.createElement('div');row.className='topic-item';row.style.marginBottom='8px';
+    row.innerHTML=`<div class="topic-num">${done?'✓':n}</div><div class="topic-text"><h3>${t}</h3><p>${d}</p></div><button class="small-btn">${done?'Done':'Mark done'}</button>`;
+    row.querySelector('button').onclick=()=>{state.reportSteps[n]=!done;saveState();renderReport()};
+    el.appendChild(row);
+  });
+  const call=document.createElement('div');call.className='callout warn';call.innerHTML='<b>Integrity rule:</b> the companion should help you organise and evaluate. It should not invent evidence or write an entire assessed report from a one-line request.';
+  el.appendChild(call);
+}
+renderReport();
+
+document.getElementById('challengeArgument').onclick=()=>{
+  const t=document.getElementById('presentationClaim').value.trim(),out=document.getElementById('presentationFeedback');
+  out.classList.remove('hidden');
+  if(!t){out.textContent='Enter your claim first.';return}
+  const qs=[
+    'What evidence supports this claim?',
+    'Could another explanation account for the issue?',
+    'Why is the international example appropriate for the Malaysian context?',
+    'What limitation exists in your recommendation?',
+    'Who might disagree with your position, and on what basis?',
+    'How does this issue affect mathematics learning rather than education in general?'
+  ];
+  out.innerHTML='<b>Challenge questions</b><ul>'+qs.slice(0,4+Math.floor(Math.random()*3)).map(q=>'<li>'+q+'</li>').join('')+'</ul>';
+};
+
+document.querySelectorAll('.exam-mode').forEach(b=>b.onclick=()=>{
+  const mode=b.dataset.mode,out=document.getElementById('examOutput');
+  if(mode==='quick') out.innerHTML='<b>Quick Revision</b><ul><li>Curriculum: document, process and experience</li><li>Curriculum types: official/formal, informal, hidden/implied, null</li><li>Design principles: relevance, continuity, integration, balance</li><li>Models: Tyler, Taba, Stenhouse</li><li>Malaysia: curriculum development, KSSR/DSKP, KP2027</li><li>Comparative and current issues require evidence and context</li></ul>';
+  if(mode==='models') out.innerHTML='<b>Compare models</b><br><br><b>Tyler:</b> objectives and alignment.<br><b>Taba:</b> inductive, teacher-involved development.<br><b>Stenhouse:</b> process-oriented and curriculum-as-practice.<br><br><b>C4 prompt:</b> Analyse how these differences influence teacher autonomy and curriculum responsiveness.';
+  if(mode==='question'){
+    const q=[
+      'Analyse how the relationship between curriculum objectives and assessment can influence curriculum coherence.',
+      'Analyse the strengths and limitations of an objectives-based curriculum model for contemporary primary mathematics.',
+      'Compare Tyler and Stenhouse in terms of curriculum flexibility and the role of the teacher.',
+      'Analyse why the enacted curriculum may differ from the official curriculum in primary mathematics classrooms.'
+    ];
+    out.innerHTML='<b>C4 Practice Question</b><br><br>'+q[Math.floor(Math.random()*q.length)]+'<br><br><small>Plan: identify components → explain relationships → examine consequences → use a relevant example.</small>';
+  }
+});
+
+function renderQuiz(){
+  const q=quizData[currentQuiz%quizData.length];
+  quizSelected=null;
+  document.getElementById('quizQuestion').textContent=q.q;
+  document.getElementById('quizExplain').classList.add('hidden');
+  const opts=document.getElementById('quizOptions');opts.innerHTML='';
+  q.options.forEach((o,i)=>{
+    const b=document.createElement('button');b.className='quiz-option';b.textContent=String.fromCharCode(65+i)+'. '+o;
+    b.onclick=()=>{quizSelected=i;document.querySelectorAll('.quiz-option').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')};
+    opts.appendChild(b);
+  });
+  document.getElementById('quizScoreBadge').textContent=state.quizCorrect+' correct';
+}
+renderQuiz();
+document.getElementById('submitQuiz').onclick=()=>{
+  if(quizSelected===null)return;
+  const q=quizData[currentQuiz%quizData.length];
+  const buttons=[...document.querySelectorAll('.quiz-option')];
+  buttons[q.ans].classList.add('correct');
+  if(quizSelected!==q.ans) buttons[quizSelected].classList.add('wrong');
+  const correct=quizSelected===q.ans;
+  state.quizAttempts++; if(correct)state.quizCorrect++;saveState();
+  const ex=document.getElementById('quizExplain');ex.classList.remove('hidden');
+  ex.innerHTML=`<b>${correct?'Correct ✓':'Not quite'}</b><br>${q.explain}`;
+  document.getElementById('quizScoreBadge').textContent=state.quizCorrect+' correct';
+};
+document.getElementById('nextQuiz').onclick=()=>{currentQuiz=(currentQuiz+1)%quizData.length;renderQuiz()};
+
+document.getElementById('runCheck').onclick=()=>{
+  const mode=document.getElementById('checkMode').value,text=document.getElementById('checkText').value.trim(),out=document.getElementById('checkFeedback');
+  out.classList.remove('hidden');
+  if(!text){out.textContent='Paste an answer first.';return}
+  if(mode==='c4'){
+    const r=c4Analysis(text);out.innerHTML=`<b>${r.level}</b> — ${r.score}/5<br><br>${r.prompts.map(x=>'• '+x).join('<br>')||'Good analytical characteristics detected.'}`;
+  }else if(mode==='c5'){
+    const r=c5Evaluate(text),miss=r.filter(x=>x.score===0).map(x=>x.name);
+    out.innerHTML=`<b>C5 check</b><br>${miss.length?'Missing or weak: '+miss.join(', '):'Main evaluation features detected.'}`;
+  }else if(mode==='evidence'){
+    const has=/according to|source|study|document|report|data|doi|oecd|timss|pisa|\(\d{4}\)/i.test(text);
+    out.innerHTML=has?'<b>Evidence signal detected.</b><br>Verify that every source is genuine and actually supports the claim.':'<b>Evidence appears weak or absent.</b><br>Add a verified source for factual or evaluative claims.';
+  }else{
+    const long=(text.match(/\b\w+\b/g)||[]).length;
+    const informal=/very good|a lot|things|stuff|I think|obviously/i.test(text);
+    out.innerHTML=`<b>Academic writing check</b><br>Word count: ${long}.<br>${informal?'Some informal/general wording detected. Use precise disciplinary language.':'Tone appears reasonably academic.'}<br>Check sentence clarity, evidence and logical links.`;
+  }
+};
+
+document.getElementById('saveSources').onclick=()=>{
+  state.sourceNotes=document.getElementById('sourceNotes').value;saveState();
+  document.getElementById('sourceSaved').classList.remove('hidden');
+};
+document.getElementById('sourceNotes').value=state.sourceNotes;
+
+document.getElementById('exportProgress').onclick=()=>{
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MTES7013_progress.json';a.click();URL.revokeObjectURL(a.href);
+};
+document.getElementById('resetProgress').onclick=()=>{
+  if(confirm('Reset all MTES7013 progress stored on this device?')){
+    localStorage.removeItem('mtes7013_state');location.reload();
+  }
+};
+
+
+/* =========================
+   ASK MTES7013 CHATBOT
+   Local course knowledge + optional secure backend
+   ========================= */
+
+const knowledgeBase = [
+  {
+    id:'curriculum-definition',
+    title:'Concept of Curriculum',
+    topic:'Topic 1',
+    keywords:['what is curriculum','define curriculum','curriculum meaning','concept of curriculum','curriculum definition'],
+    answer:`<p><b>Curriculum</b> is more than a syllabus or list of topics. In MTES7013, it is useful to view curriculum as the organised educational intentions, content, learning experiences, teaching processes and assessment expectations through which an education system develops learners.</p>
+    <p>You should be able to analyse curriculum in at least three dimensions: <b>document</b> (what is officially intended), <b>process</b> (how teachers translate it into teaching), and <b>experience</b> (what pupils actually encounter).</p>`,
+    follow:['What is curriculum as document, process and experience?','What are the types of curriculum?','Give me a mathematics example.']
+  },
+  {
+    id:'dimensions',
+    title:'Curriculum as Document, Process and Experience',
+    topic:'Topic 1',
+    keywords:['document process experience','curriculum as document','curriculum as process','curriculum as experience','intended enacted experienced'],
+    answer:`<p><b>Document:</b> what is officially intended—for example DSKP, learning standards and official guidance.</p>
+    <p><b>Process:</b> how teachers interpret and enact the curriculum through tasks, explanations, questioning and assessment.</p>
+    <p><b>Experience:</b> what pupils actually experience and learn.</p>
+    <p>A useful C4 relationship is: <b>official intention → teacher interpretation → classroom enactment → pupil experience</b>. Misalignment can occur at any point.</p>`,
+    follow:['Give me an example of curriculum misalignment.','How can this appear in an exam question?']
+  },
+  {
+    id:'types-curriculum',
+    title:'Types of Curriculum',
+    topic:'Topic 1',
+    keywords:['types of curriculum','formal curriculum','official curriculum','informal curriculum','hidden curriculum','null curriculum','implied curriculum'],
+    answer:`<p><b>Official curriculum</b> is formally approved by the education authority. <b>Formal curriculum</b> is planned timetabled learning. <b>Informal curriculum</b> is learning that occurs outside formally planned content. <b>Hidden/implied curriculum</b> refers to values and expectations communicated indirectly. <b>Null curriculum</b> refers to what is omitted or given little attention.</p>
+    <p><b>Mathematics example:</b> if teachers repeatedly praise only the fastest pupils, the hidden curriculum may communicate that being “good at mathematics” means speed. If pupils rarely justify answers, mathematical argument may effectively become part of the null curriculum.</p>`,
+    follow:['What is the difference between hidden and null curriculum?','Give me a scenario question.']
+  },
+  {
+    id:'hidden-null',
+    title:'Hidden vs Null Curriculum',
+    topic:'Topic 1',
+    keywords:['difference hidden null','hidden vs null','hidden and null curriculum','null vs hidden'],
+    answer:`<p>The key difference is <b>implicit message versus omission</b>.</p>
+    <ul><li><b>Hidden curriculum:</b> pupils learn an unstated value, norm or expectation through school practices.</li><li><b>Null curriculum:</b> something important is absent, omitted or receives so little attention that pupils do not meaningfully encounter it.</li></ul>
+    <p>Example: rewarding only speed can create a hidden message about mathematics ability. Never asking pupils to justify solutions can make mathematical argument part of the null curriculum.</p>`,
+    follow:['Test me on curriculum types.','How do I analyse this at C4?']
+  },
+  {
+    id:'design-principles',
+    title:'Curriculum Design Principles',
+    topic:'Topic 2',
+    keywords:['design principles','relevance continuity integration balance','curriculum principles'],
+    answer:`<p>Four useful curriculum design principles are:</p>
+    <ul><li><b>Relevance:</b> learning connects with educational goals and learner needs.</li><li><b>Continuity:</b> important ideas recur with increasing sophistication.</li><li><b>Integration:</b> meaningful connections are created across topics or disciplines.</li><li><b>Balance:</b> curriculum emphasis is not distorted toward only one kind of learning.</li></ul>
+    <p>In mathematics, balance may mean developing <b>conceptual understanding, procedural fluency, reasoning and problem solving</b> rather than rewarding procedures alone.</p>`,
+    follow:['Explain continuity with a mathematics example.','How can I analyse curriculum balance?']
+  },
+  {
+    id:'tyler',
+    title:'Tyler Model',
+    topic:'Topic 2',
+    keywords:['tyler','tyler model','objectives model','objective model'],
+    answer:`<p>The <b>Tyler Model</b> is commonly treated as an objectives-oriented curriculum model. Its logic links educational purposes with learning experiences, organisation and evaluation.</p>
+    <p><b>Strength:</b> it supports clear alignment—objectives can guide what is taught and what is assessed.</p>
+    <p><b>Limitation:</b> if applied too rigidly, predetermined objectives can constrain responsiveness to emerging learner needs or complex mathematical thinking.</p>
+    <p>For C4, do not merely list stages. Analyse how an objectives-first design affects <b>alignment, teacher flexibility and assessment</b>.</p>`,
+    follow:['Compare Tyler and Taba.','Compare Tyler and Stenhouse.','Give me a C4 Tyler question.']
+  },
+  {
+    id:'taba',
+    title:'Taba Model',
+    topic:'Topic 2',
+    keywords:['taba','taba model','inductive model','grassroots curriculum'],
+    answer:`<p>The <b>Taba Model</b> is often described as more inductive and teacher-involved than a purely top-down model. It gives strong attention to diagnosing learner needs and involving teachers in curriculum development.</p>
+    <p>This can improve contextual responsiveness because teachers work close to learners. However, strong teacher involvement also requires professional expertise and mechanisms to maintain curriculum coherence across classrooms and schools.</p>`,
+    follow:['Compare Tyler and Taba.','What is the strength of teacher involvement?']
+  },
+  {
+    id:'stenhouse',
+    title:'Stenhouse Process Model',
+    topic:'Topic 2',
+    keywords:['stenhouse','stenhouse model','process model','curriculum process'],
+    answer:`<p>The <b>Stenhouse Process Model</b> views curriculum more as a process to be enacted, investigated and refined through practice than as a fixed package of predetermined outcomes.</p>
+    <p>The teacher is therefore an active professional interpreter and reflective inquirer. This can support flexibility and responsiveness, but it places high demands on teacher expertise and may create variation if professional support is weak.</p>
+    <p>Do not write that Stenhouse has “no goals.” The important difference concerns how tightly outcomes prescribe the learning process.</p>`,
+    follow:['Why is Stenhouse called a process model?','Compare Tyler and Stenhouse.']
+  },
+  {
+    id:'tyler-stenhouse',
+    title:'Tyler vs Stenhouse',
+    topic:'Topic 2',
+    keywords:['tyler and stenhouse','tyler vs stenhouse','difference between tyler and stenhouse','compare tyler stenhouse'],
+    answer:`<p>The central contrast is <b>objectives-first planning versus curriculum-as-process</b>.</p>
+    <ul>
+      <li><b>Tyler:</b> clearer predetermined objectives and alignment among purposes, learning experiences and evaluation.</li>
+      <li><b>Stenhouse:</b> greater emphasis on the quality of educational processes, teacher judgement and curriculum refinement through practice.</li>
+    </ul>
+    <p><b>C4 analysis:</b> Tyler can strengthen consistency and assessment alignment, but may become rigid if objectives are too narrow. Stenhouse can strengthen responsiveness and professional autonomy, but depends more heavily on teacher expertise and may make consistency harder to maintain.</p>`,
+    follow:['Which model gives teachers more autonomy?','Give me an exam-style comparison question.']
+  },
+  {
+    id:'tyler-taba',
+    title:'Tyler vs Taba',
+    topic:'Topic 2',
+    keywords:['tyler and taba','tyler vs taba','difference between tyler and taba','compare tyler taba'],
+    answer:`<p>Both Tyler and Taba can be associated with objectives-oriented curriculum planning, but they differ in <b>where curriculum development is initiated and how teachers participate</b>.</p>
+    <p><b>Tyler</b> emphasises systematic alignment beginning with educational purposes. <b>Taba</b> places stronger emphasis on diagnosis of learner needs and teacher involvement in developing curriculum from classroom realities.</p>
+    <p>A strong C4 answer should explain the consequence: Taba may be more responsive to local learner needs, while Tyler may make system-wide alignment easier to specify.</p>`,
+    follow:['What is inductive curriculum development?','Which model is more suitable for teacher-led curriculum work?']
+  },
+  {
+    id:'vertical-horizontal',
+    title:'Vertical and Horizontal Curriculum Organisation',
+    topic:'Topic 2',
+    keywords:['vertical horizontal','vertical curriculum','horizontal curriculum','vertical and horizontal'],
+    answer:`<p><b>Vertical organisation</b> concerns progression across levels or years. It asks how prior knowledge develops into more sophisticated learning.</p>
+    <p><b>Horizontal organisation</b> concerns relationships among strands, subjects or learning experiences at a similar level.</p>
+    <p>Mathematics example: whole-number place value progressing into decimals is vertical. Connecting measurement and data in a Year 4 STEM investigation is horizontal.</p>`,
+    follow:['Why is vertical progression important in mathematics?','Give me another horizontal example.']
+  },
+  {
+    id:'malaysia-reform',
+    title:'Malaysian Mathematics Curriculum Development',
+    topic:'Topic 3',
+    keywords:['malaysian curriculum development','mathematics curriculum malaysia history','curriculum reform malaysia','traditional modern new integrated mathematics'],
+    answer:`<p>MTES7013 studies Malaysian mathematics curriculum development as a process of reform, not merely a timeline. The course identifies a broad sequence from <b>Traditional Mathematics → Modern Mathematics → New Mathematics → Integrated Mathematics → teaching Mathematics in English → standards-based curriculum/KSSR → later development toward KP2027</b>.</p>
+    <p>For analysis, ask five questions: What problem was the reform addressing? What changed? What assumptions about learning are visible? What did teachers need to do differently? What new benefit or challenge followed?</p>`,
+    follow:['Why do mathematics curricula change?','Give me the five-question reform lens.']
+  },
+  {
+    id:'reform-drivers',
+    title:'Drivers of Mathematics Curriculum Change',
+    topic:'Topic 3',
+    keywords:['why curriculum change','factors curriculum change','drivers curriculum reform','national aspirations learner needs mathematics subject'],
+    answer:`<p>Three major drivers in this course are:</p>
+    <ol><li><b>National aspirations and needs</b>—the capabilities society expects future citizens to have.</li><li><b>Children’s learning needs</b>—how pupils learn and what support they need.</li><li><b>Needs of mathematics as a subject</b>—the concepts, structures and mathematical practices that should be developed.</li></ol>
+    <p>These drivers can support one another, but they can also create tension. For example, adding new competencies without reducing content can increase curriculum pressure.</p>`,
+    follow:['Give me a C4 question about curriculum change.','What is curriculum overload?']
+  },
+  {
+    id:'dskp',
+    title:'DSKP Mathematics',
+    topic:'Topic 4',
+    keywords:['dskp','dokumen standard kurikulum','dskp mathematics','kssr dskp'],
+    answer:`<p><b>DSKP</b> brings curriculum expectations and assessment standards together. This matters because teaching and assessment should be aligned with intended learning.</p>
+    <p>A useful chain is: <b>Curriculum aims → Content → Learning Standards → Teaching tasks → Evidence of learning → Performance judgement</b>.</p>
+    <p>If a Learning Standard asks pupils to explain a strategy but assessment checks only the final answer, the evidence is incomplete and alignment is weak.</p>`,
+    follow:['Explain Content, Learning and Performance Standards.','What is Fikrah Matematik?','How do I analyse a DSKP Learning Standard?']
+  },
+  {
+    id:'standards',
+    title:'Content, Learning and Performance Standards',
+    topic:'Topic 4',
+    keywords:['content standard learning standard performance standard','content standards','learning standards','performance standards','difference standards'],
+    answer:`<p><b>Content Standard:</b> a broad statement of the intended mathematical knowledge or capability.</p>
+    <p><b>Learning Standard:</b> a more specific expectation of what pupils should demonstrate.</p>
+    <p><b>Performance Standard:</b> supports judgement about the level or quality of demonstrated mastery.</p>
+    <p>The key distinction is that Performance Standards are not simply another list of content; they help teachers interpret <b>how well</b> learning has been demonstrated.</p>`,
+    follow:['Give me a simple example of the three standards.','How does this relate to classroom assessment?']
+  },
+  {
+    id:'fikrah',
+    title:'Fikrah Matematik',
+    topic:'Topic 4',
+    keywords:['fikrah matematik','mathematical thinking framework','explain fikrah'],
+    answer:`<p><b>Fikrah Matematik</b> can be understood in this course as an orientation toward developing mathematically capable learners through interconnected <b>knowledge, skills, mathematical processes and values</b>, rather than treating mathematics as isolated procedures.</p>
+    <p>Its curriculum significance is that pupils should not only obtain correct answers; they should also reason, make connections, communicate and apply mathematics meaningfully.</p>`,
+    follow:['How is Fikrah Matematik related to mathematical processes?','Give me a classroom example.']
+  },
+  {
+    id:'kssr-kp2027',
+    title:'KSSR/DSKP and KP2027 Direction',
+    topic:'Topic 4',
+    keywords:['kssr and kp2027','compare kssr kp2027','kp2027','character development integrated learning competency'],
+    answer:`<p>For MTES7013, study KSSR/DSKP through its curriculum framework, standards, mathematical processes and classroom assessment. The course highlights KP2027 through three directions: <b>Character Development, Integrated Learning and a Competency-Oriented Curriculum</b>.</p>
+    <p>A useful analytical comparison is not “old versus new,” but how curriculum emphasis may shift from specifying content and standards toward stronger integration, competency demonstration and character development.</p>
+    <p>Any detailed policy claim should be checked against the current official KP2027 documents.</p>`,
+    follow:['What does competency-oriented curriculum mean?','Give me a mathematics example of integrated learning.']
+  },
+  {
+    id:'hots',
+    title:'HOTS in Mathematics',
+    topic:'Topic 4',
+    keywords:['hots','higher order thinking','higher-order thinking','h ots mathematics'],
+    answer:`<p>HOTS should not be equated with “harder numbers.” Higher-order thinking involves cognitive demand such as <b>analysing relationships, evaluating strategies, generalising, justifying or creating approaches</b>.</p>
+    <p>Example: “Calculate 36 × 8” mainly checks computation. “Compare two strategies for 36 × 8, explain why both work and decide which is more efficient under a stated criterion” requires higher-order thinking.</p>`,
+    follow:['Give me another HOTS mathematics example.','How can I create a C4 question?']
+  },
+  {
+    id:'ibme',
+    title:'Inquiry-Based Mathematics Education',
+    topic:'Topic 4',
+    keywords:['ibme','inquiry based mathematics','inquiry-based mathematics','inquiry mathematics'],
+    answer:`<p><b>Inquiry-Based Mathematics Education (IBME)</b> involves pupils exploring mathematical relationships, making conjectures, testing ideas, explaining patterns and justifying conclusions.</p>
+    <p>Inquiry does <b>not</b> mean that the teacher provides no guidance. The teacher still selects purposeful tasks, asks questions, provides scaffolding and consolidates important mathematics.</p>`,
+    follow:['Give me an IBME lesson example.','How is IBME different from PBL?']
+  },
+  {
+    id:'pbl',
+    title:'Project-Based Learning in Mathematics',
+    topic:'Topic 4',
+    keywords:['project based learning','project-based learning','pbl mathematics','project mathematics'],
+    answer:`<p><b>Project-Based Learning</b> places mathematics within an extended purposeful task or product. The curriculum challenge is to ensure that mathematics remains explicit and assessable rather than becoming secondary to the project theme.</p>
+    <p>A strong mathematics project should require pupils to apply mathematical concepts, make decisions, justify methods and communicate results.</p>`,
+    follow:['How is PBL different from IBME?','Give me a primary mathematics PBL example.']
+  },
+  {
+    id:'ibme-pbl',
+    title:'IBME vs Project-Based Learning',
+    topic:'Topic 4',
+    keywords:['ibme vs pbl','difference ibme pbl','ibme and project based learning','compare inquiry project'],
+    answer:`<p><b>IBME</b> is centred on mathematical inquiry: exploring patterns, conjecturing, testing and justifying. <b>Project-Based Learning</b> is centred on an extended purposeful project or product that may integrate several learning areas.</p>
+    <p>They can overlap. A project may contain inquiry, but the critical difference is the organising structure: IBME is organised around mathematical investigation, whereas PBL is organised around a broader project challenge.</p>`,
+    follow:['Which is more suitable for mathematics reasoning?','Give me examples of both.']
+  },
+  {
+    id:'comparison-method',
+    title:'How to Compare and Evaluate Curricula',
+    topic:'Topic 5',
+    keywords:['how compare curricula','compare curriculum','evaluate curricula','comparative curriculum','how do i evaluate two curricula','evaluation curriculum'],
+    answer:`<p>Use a clear evaluation chain:</p>
+    <p><b>Criterion → Evidence → Comparison → Interpretation → Judgement → Contextual qualification → Recommendation</b></p>
+    <p>For example, choose a criterion such as mathematical reasoning. Gather verified evidence from Malaysia and the selected country, explain the meaningful similarity/difference, judge which approach is stronger under that criterion, and then consider whether the practice is transferable to Malaysia.</p>
+    <p>Do not conclude that one whole curriculum is “better” merely because one feature or international score is stronger.</p>`,
+    follow:['What comparison criteria can I use?','Show me a C5 paragraph structure.','How should I use PISA or TIMSS evidence?']
+  },
+  {
+    id:'comparison-criteria',
+    title:'Curriculum Comparison Criteria',
+    topic:'Topic 5',
+    keywords:['comparison criteria','criteria compare curriculum','what criteria curriculum comparison'],
+    answer:`<p>Useful criteria include <b>aims/philosophy, content organisation, learning areas, mathematical processes, pedagogy, problem solving, reasoning, assessment, HOTS, technology, inclusion and teacher autonomy</b>.</p>
+    <p>For a 1200-word report, select only a few criteria that allow meaningful evidence-based judgement. Trying to compare everything usually produces description rather than evaluation.</p>`,
+    follow:['Which 3 criteria are manageable for a 1200-word report?','How do I write the judgement?']
+  },
+  {
+    id:'timss-pisa',
+    title:'TIMSS and PISA in Curriculum Evaluation',
+    topic:'Topic 5',
+    keywords:['timss pisa','pisa timss','international assessment','timss','pisa','sea-plm','sea plm'],
+    answer:`<p>International assessments can inform curriculum discussion, but they are <b>not the curriculum itself</b>. Before using results, consider what the assessment measures, the target population, domains, purpose and context.</p>
+    <p>Avoid the claim: “Country A scored higher, therefore its curriculum is better.” Performance is influenced by curriculum, implementation, teaching, socioeconomic context and other factors.</p>
+    <p>Use international assessment evidence as <b>one part of an argument</b>, not as automatic proof of curriculum superiority.</p>`,
+    follow:['What is wrong with using PISA rankings alone?','How can TIMSS evidence support a report?']
+  },
+  {
+    id:'trend-issue-challenge',
+    title:'Trend, Issue and Challenge',
+    topic:'Topic 6',
+    keywords:['trend issue challenge','difference trend issue challenge','trends issues challenges'],
+    answer:`<p>A <b>trend</b> is a direction of change gaining attention or adoption, such as AI-assisted learning. An <b>issue</b> is a matter requiring educational judgement or debate, such as how assessment should balance reasoning and accountability. A <b>challenge</b> is a barrier that makes curriculum goals difficult to achieve, such as teacher PCK or resource disparity.</p>
+    <p>The same topic may fall into more than one category. AI can be a trend while equitable access becomes a challenge.</p>`,
+    follow:['Give me examples for a presentation.','How do I evaluate a trend at C5?']
+  },
+  {
+    id:'ai-tech',
+    title:'AI and Technology in Mathematics Education',
+    topic:'Topic 6',
+    keywords:['ai mathematics','artificial intelligence mathematics','technology mathematics','adaptive learning','geogebra','desmos','gamification'],
+    answer:`<p>Technology can support visualisation, feedback, practice, exploration and formative assessment, but its value depends on <b>mathematical purpose</b>.</p>
+    <p>Evaluate a tool using criteria such as learning value, accessibility, teacher readiness, feedback quality, data privacy and curriculum alignment. Ask: “What mathematical thinking becomes possible or more visible through this technology?”</p>
+    <p>Avoid assuming that engagement automatically means deeper learning.</p>`,
+    follow:['What are the risks of gamification?','How can GeoGebra support reasoning?','Give me a C5 AI presentation question.']
+  },
+  {
+    id:'gamification',
+    title:'Gamification',
+    topic:'Topic 6',
+    keywords:['gamification','game based','game-based','games mathematics'],
+    answer:`<p><b>Gamification</b> uses game-like elements such as points, levels, challenges and feedback. It can increase participation and practice, but curriculum evaluation should examine <b>what behaviour the design rewards</b>.</p>
+    <p>If rewards prioritise speed only, pupils may infer that fast answers matter more than reasoning. Better design can reward explanation, strategic choice, accuracy, persistence and improvement.</p>`,
+    follow:['How is gamification related to hidden curriculum?','Give me strengths and limitations.']
+  },
+  {
+    id:'equity',
+    title:'Equity and Inclusion',
+    topic:'Topic 6',
+    keywords:['equity inclusion','equality equity','urban rural','socioeconomic disparity','inclusive mathematics'],
+    answer:`<p><b>Equality</b> generally refers to providing the same provision, whereas <b>equity</b> asks whether different learners need different support to gain meaningful access to common learning goals.</p>
+    <p>In mathematics curriculum implementation, equity may be affected by socioeconomic conditions, geography, language, disability, technology access and prior learning. A digital innovation can increase opportunity for some pupils while widening gaps for others if access is uneven.</p>`,
+    follow:['Give me a mathematics equity example.','How can I evaluate technology from an equity perspective?']
+  },
+  {
+    id:'pck',
+    title:'Pedagogical Content Knowledge',
+    topic:'Topic 6',
+    keywords:['pck','pedagogical content knowledge','teacher knowledge','teacher pck'],
+    answer:`<p><b>Pedagogical Content Knowledge (PCK)</b> is knowledge of how to make specific subject content learnable. In mathematics this includes anticipating misconceptions, selecting representations and examples, asking productive questions, sequencing ideas and responding to pupil thinking.</p>
+    <p>Its curriculum significance is that ambitious curriculum intentions—such as reasoning or inquiry—depend on teachers knowing how to enact them, not merely knowing mathematics themselves.</p>`,
+    follow:['Why can weak PCK create an implementation gap?','Give me a fraction PCK example.']
+  },
+  {
+    id:'language',
+    title:'Language Challenges in Mathematics',
+    topic:'Topic 6',
+    keywords:['language mathematics','language challenge','mathematical language','language related'],
+    answer:`<p>Mathematics uses specialised vocabulary, symbols, representations and forms of explanation. Pupils may understand a concept but struggle to express it in the language of instruction, or everyday meanings may conflict with mathematical meanings.</p>
+    <p>Examples include words such as <b>difference, product, mean and volume</b>. Effective teaching therefore makes mathematical language explicit while supporting conceptual understanding.</p>`,
+    follow:['How does language affect assessment?','Give me a classroom support strategy.']
+  },
+  {
+    id:'c4',
+    title:'C4 Analysis',
+    topic:'Course Assessment',
+    keywords:['c4','c4 analysis','analyse','analysis level','what is c4','bloom c4'],
+    answer:`<p><b>C4 Analysis</b> requires more than explaining what something is. You break an idea into components and examine <b>relationships, assumptions, causes, consequences, patterns or contrasts</b>.</p>
+    <p>A useful answer pattern is: <b>identify the feature → explain how components relate → analyse why the relationship matters → discuss a consequence or trade-off → apply to mathematics education</b>.</p>
+    <p>If your answer is mainly definitions and lists, it is probably still descriptive.</p>`,
+    follow:['Give me a C4 question.','Check whether my answer is C4.','What is the difference between C4 and C5?']
+  },
+  {
+    id:'c5',
+    title:'C5 Evaluation',
+    topic:'Course Assessment',
+    keywords:['c5','c5 evaluation','evaluate','evaluation level','what is c5','bloom c5'],
+    answer:`<p><b>C5 Evaluation</b> requires a judgement made using explicit criteria and evidence.</p>
+    <p>Use this chain: <b>Claim → Evidence → Comparison/analysis → Judgement → Justification</b>. Strong evaluation also recognises limitations or contextual conditions.</p>
+    <p>For MTES7013, CLO2 and CLO3 require you to justify why one curriculum feature, response or recommendation is more appropriate under a stated criterion.</p>`,
+    follow:['Show me a C5 paragraph structure.','What is the difference between C4 and C5?','How do I avoid descriptive writing?']
+  },
+  {
+    id:'c4-c5',
+    title:'C4 vs C5',
+    topic:'Course Assessment',
+    keywords:['c4 vs c5','difference between c4 and c5','c4 and c5','analysis vs evaluation'],
+    answer:`<p><b>C4 Analyse:</b> examine parts and relationships—how, why, causes, consequences, assumptions, similarities and differences.</p>
+    <p><b>C5 Evaluate:</b> go one step further and make a <b>justified judgement</b> using criteria and evidence.</p>
+    <p>Example: C4 asks, “How do Tyler and Stenhouse differ in teacher autonomy, and what consequences follow?” C5 asks, “Which model is more appropriate for a stated curriculum context, using teacher autonomy and coherence as criteria, and why?”</p>`,
+    follow:['Give me one C4 and one C5 practice question.','How do I turn description into evaluation?']
+  },
+  {
+    id:'report',
+    title:'Comparative Curriculum Evaluation Report',
+    topic:'Assessment',
+    keywords:['report','comparative report','30%','assignment','1200 words','curriculum evaluation report'],
+    answer:`<p>For the <b>30% Comparative Curriculum Evaluation Report</b>, keep the comparison focused. A practical workflow is:</p>
+    <ol><li>Select one international curriculum.</li><li>Choose two or three clear criteria.</li><li>Gather verified official and academic evidence.</li><li>Build a comparison matrix.</li><li>Interpret the differences rather than listing them.</li><li>Make a C5 judgement.</li><li>Justify one alternative practice that could be adapted to Malaysia.</li></ol>
+    <p>The key is <b>evaluation</b>, not country description.</p>`,
+    follow:['What 3 criteria should I choose?','Show me a report paragraph structure.','How can I check if my paragraph is C5?']
+  },
+  {
+    id:'presentation',
+    title:'Group Presentation',
+    topic:'Assessment',
+    keywords:['presentation','group presentation','20%','clo3','presentation coach'],
+    answer:`<p>For the <b>20% group presentation</b>, structure the argument as:</p>
+    <ol><li>Define the trend/issue/challenge.</li><li>Establish the Malaysian context.</li><li>Present credible evidence.</li><li>Explain the impact on mathematics curriculum or learning.</li><li>Add an international perspective.</li><li>Evaluate strengths, limitations or trade-offs.</li><li>State your group's justified position.</li><li>Recommend one feasible improvement.</li></ol>
+    <p>A recommendation should follow from the evidence, not appear before the analysis.</p>`,
+    follow:['Give me a suitable presentation issue.','Challenge my presentation argument.']
+  },
+  {
+    id:'exam',
+    title:'MTES7013 Examination',
+    topic:'Assessment',
+    keywords:['exam','examination','50%','exam revision','final exam'],
+    answer:`<p>The <b>50% examination</b> is aligned primarily with CLO1 and C4 analysis. Prioritise curriculum concepts, design principles, Tyler/Taba/Stenhouse, Malaysian curriculum development and the relationships among curriculum design, implementation and evaluation.</p>
+    <p>Revision should therefore go beyond memorising definitions. Practise analysing scenarios, comparing models under a criterion and explaining consequences for primary mathematics.</p>`,
+    follow:['Give me an exam question.','Quiz me on Tyler, Taba and Stenhouse.']
+  }
+];
+
+const stopWords = new Set(['the','a','an','is','are','was','were','what','why','how','can','could','would','should','do','does','did','of','to','for','in','on','with','and','or','about','me','i','my','it','this','that','please','explain','tell','give']);
+function normaliseQuery(q){
+  return q.toLowerCase().replace(/[^\p{L}\p{N}\s-]/gu,' ').replace(/\s+/g,' ').trim();
+}
+function wordsOf(q){
+  return normaliseQuery(q).split(' ').filter(w=>w.length>1 && !stopWords.has(w));
+}
+function scoreKnowledge(entry, query){
+  const q = normaliseQuery(query);
+  const qwords = wordsOf(q);
+  let score = 0;
+  for(const kw of entry.keywords){
+    const k = normaliseQuery(kw);
+    if(q.includes(k)) score += 10 + k.split(' ').length * 2;
+    const kws = k.split(' ');
+    kws.forEach(w=>{ if(w.length>2 && qwords.includes(w)) score += 2; });
+  }
+  const title = normaliseQuery(entry.title);
+  qwords.forEach(w=>{ if(w.length>2 && title.includes(w)) score += 1.5; });
+  return score;
+}
+function findKnowledge(query){
+  const ranked = knowledgeBase
+    .map(e=>({e,score:scoreKnowledge(e,query)}))
+    .sort((a,b)=>b.score-a.score);
+  if(ranked[0]?.score >= 5) return ranked[0].e;
+
+  // Contextual follow-up: use previous topic when the new message is referential.
+  if(state.lastKnowledgeId && /^(why|how|which|what about|give|another|example|more|can you|is it|does it|compare it|explain more)/i.test(query.trim())){
+    const last = knowledgeBase.find(e=>e.id===state.lastKnowledgeId);
+    if(last) return last;
+  }
+  return null;
+}
+function genericCourseFallback(query){
+  const q = normaliseQuery(query);
+  let likely = null;
+  if(/curriculum|hidden|null|formal|informal/.test(q)) likely='Topic 1: Introduction to Curriculum';
+  else if(/model|design|tyler|taba|stenhouse|vertical|horizontal/.test(q)) likely='Topic 2: Curriculum Design';
+  else if(/malaysia|reform|history|development/.test(q)) likely='Topic 3: Malaysian Mathematics Curriculum Development';
+  else if(/dskp|kssr|kp2027|fikrah|hots|standard|ibme|project/.test(q)) likely='Topic 4: Malaysian Primary Mathematics Curriculum';
+  else if(/compare|country|singapore|finland|england|australia|timss|pisa/.test(q)) likely='Topic 5: Comparative Curriculum Analysis';
+  else if(/ai|technology|equity|pck|language|issue|challenge|trend|gamification/.test(q)) likely='Topic 6: Trends, Issues and Challenges';
+
+  return `<p>I understand this as an MTES7013 question${likely?` related to <b>${likely}</b>`:''}, but my current embedded answer bank does not contain enough detail to answer it confidently.</p>
+  <p>Try rephrasing with the specific concept, for example: <i>“Compare Tyler and Stenhouse in terms of teacher autonomy”</i> or <i>“How does DSKP connect teaching and assessment?”</i></p>
+  <p>If you later connect the secure AI backend, this same chat interface will be able to handle much broader free-form questions while using the MTES7013 knowledge base.</p>`;
+}
+
+function addMessage(role, html, meta={}){
+  const wrap = document.createElement('div');
+  wrap.className='msg '+role;
+  if(role==='bot'){
+    wrap.innerHTML=`<div class="mini-avatar">🎓</div><div class="bubble">${html}${meta.source?`<div class="answer-source">Course basis: ${escapeHtml(meta.source)}</div>`:''}${meta.follow?.length?`<div class="followups">${meta.follow.slice(0,3).map(f=>`<button class="followup">${escapeHtml(f)}</button>`).join('')}</div>`:''}</div>`;
+  }else{
+    wrap.innerHTML=`<div class="bubble">${escapeHtml(html)}</div>`;
+  }
+  document.getElementById('chatMessages').appendChild(wrap);
+  wrap.querySelectorAll('.followup').forEach(btn=>btn.onclick=()=>submitChat(btn.textContent));
+  const box=document.getElementById('chatMessages');
+  box.scrollTop=box.scrollHeight;
+}
+function renderChatHistory(){
+  const box=document.getElementById('chatMessages');box.innerHTML='';
+  if(!state.chatHistory.length){
+    addMessage('bot',`<p>Hello <b>${escapeHtml(getTelegramName())}</b>. I am your MTES7013 Study Companion.</p>
+      <p>You can ask me about curriculum concepts, Tyler/Taba/Stenhouse, Malaysian mathematics curriculum, DSKP, Fikrah Matematik, KP2027, curriculum comparison, C4/C5, current issues, your report, presentation or exam preparation.</p>
+      <p><b>Try:</b> “What is the difference between Tyler and Stenhouse?”</p>`,
+      {source:'MTES7013 course knowledge base'});
+    return;
+  }
+  state.chatHistory.forEach(m=>addMessage(m.role,m.html,{source:m.source,follow:m.follow}));
+}
+function storeChat(role, html, meta={}){
+  state.chatHistory.push({role,html,source:meta.source||'',follow:meta.follow||[]});
+  if(state.chatHistory.length>40) state.chatHistory=state.chatHistory.slice(-40);
+  saveState();
+}
+function showTyping(){
+  const wrap=document.createElement('div');wrap.className='msg bot';wrap.id='typingMsg';
+  wrap.innerHTML='<div class="mini-avatar">🎓</div><div class="bubble"><span class="typing"><i></i><i></i><i></i></span></div>';
+  document.getElementById('chatMessages').appendChild(wrap);
+  const box=document.getElementById('chatMessages');box.scrollTop=box.scrollHeight;
+}
+function hideTyping(){document.getElementById('typingMsg')?.remove()}
+
+async function tryBackend(question){
+  // GitHub Pages has no server-side API. When V3 is hosted with the included Node server,
+  // the same frontend automatically uses /api/chat.
+  if(location.protocol==='file:' || location.hostname.endsWith('github.io')) return null;
+  try{
+    const recent = state.chatHistory.slice(-10).map(m=>({role:m.role==='bot'?'assistant':'user',content:m.html.replace(/<[^>]*>/g,' ')}));
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:question,history:recent})});
+    if(!r.ok) return null;
+    const data=await r.json();
+    if(data?.answer) return {answer:data.answer,source:data.source||'AI tutor using MTES7013 knowledge base',follow:data.follow||[]};
+  }catch(e){}
+  return null;
+}
+
+async function answerLocally(question){
+  const entry=findKnowledge(question);
+  if(entry){
+    state.lastKnowledgeId=entry.id;saveState();
+    return {answer:entry.answer,source:`${entry.topic} — ${entry.title}`,follow:entry.follow||[]};
+  }
+  return {answer:genericCourseFallback(question),source:'MTES7013 course scope',follow:['Show me the six course topics.','What is C4 analysis?','How do I evaluate two curricula?']};
+}
+
+async function submitChat(forcedText){
+  const input=document.getElementById('chatInput');
+  const question=(forcedText ?? input.value).trim();
+  if(!question)return;
+  input.value='';input.style.height='44px';
+  addMessage('user',question);storeChat('user',question);
+  showTyping();
+
+  // Prefer secure backend when available; otherwise use embedded knowledge.
+  let result=await tryBackend(question);
+  if(!result) result=await answerLocally(question);
+
+  hideTyping();
+  addMessage('bot',result.answer,{source:result.source,follow:result.follow});
+  storeChat('bot',result.answer,{source:result.source,follow:result.follow});
+}
+document.getElementById('sendChat').onclick=()=>submitChat();
+document.getElementById('chatInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter' && !e.shiftKey){e.preventDefault();submitChat();}
+});
+document.getElementById('chatInput').addEventListener('input',e=>{
+  e.target.style.height='44px';
+  e.target.style.height=Math.min(120,e.target.scrollHeight)+'px';
+});
+document.querySelectorAll('.suggestion').forEach(b=>b.onclick=()=>submitChat(b.textContent));
+document.getElementById('clearChat').onclick=()=>{
+  if(confirm('Clear this MTES7013 conversation?')){
+    state.chatHistory=[];state.lastKnowledgeId=null;saveState();renderChatHistory();
+  }
+};
+renderChatHistory();
+
+// Basic modal utility for future extension
+document.getElementById('closeModal').onclick=()=>document.getElementById('modal').classList.remove('show');
+
+</script>
+</body>
+</html>
